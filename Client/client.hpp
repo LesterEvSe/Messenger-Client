@@ -1,20 +1,20 @@
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
+#ifndef CLIENT_H
+#define CLIENT_H
 
-#include <QTcpSocket>
+#include <QWidget>
 
-class Client : public QObject
+QT_BEGIN_NAMESPACE
+namespace Ui { class Widget; }
+QT_END_NAMESPACE
+
+class Client : public QWidget
 {
     Q_OBJECT
 private:
-    QTcpSocket *socket;
-
-private slots:
-    void readyRead();
+    Ui::Widget *ui;
 
 public:
-    explicit Client(QObject *parent = nullptr);
-    void connectToServer();
+    Client(QWidget *parent = nullptr);
+    ~Client();
 };
-
-#endif // CLIENT_HPP
+#endif // CLIENT_H
