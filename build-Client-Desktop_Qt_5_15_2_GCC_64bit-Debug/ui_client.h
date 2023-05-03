@@ -16,72 +16,67 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
-class Ui_Widget
+class Ui_Client
 {
 public:
-    QVBoxLayout *verticalLayout_2;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label;
     QLabel *label_2;
     QLabel *label_3;
+    QPushButton *connectButton;
     QHBoxLayout *horizontalLayout;
-    QListWidget *listWidget_2;
     QListWidget *listWidget;
+    QTextBrowser *textBrowser;
     QListWidget *listWidget_3;
     QHBoxLayout *horizontalLayout_3;
-    QLineEdit *textToSendLineEdit;
-    QPushButton *pushButton;
+    QLineEdit *sendMessageLineEdit;
+    QPushButton *sendMessageButton;
 
-    void setupUi(QWidget *Widget)
+    void setupUi(QWidget *Client)
     {
-        if (Widget->objectName().isEmpty())
-            Widget->setObjectName(QString::fromUtf8("Widget"));
-        Widget->setEnabled(true);
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(Widget->sizePolicy().hasHeightForWidth());
-        Widget->setSizePolicy(sizePolicy);
-        Widget->setAcceptDrops(false);
-        Widget->setAutoFillBackground(false);
-        verticalLayout_2 = new QVBoxLayout(Widget);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        verticalLayout = new QVBoxLayout();
+        if (Client->objectName().isEmpty())
+            Client->setObjectName(QString::fromUtf8("Client"));
+        Client->resize(670, 453);
+        QFont font;
+        font.setPointSize(14);
+        Client->setFont(font);
+        verticalLayout = new QVBoxLayout(Client);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        label = new QLabel(Widget);
+        label = new QLabel(Client);
         label->setObjectName(QString::fromUtf8("label"));
-        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy1.setHorizontalStretch(1);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(1);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy);
         label->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_2->addWidget(label);
 
-        label_2 = new QLabel(Widget);
+        label_2 = new QLabel(Client);
         label_2->setObjectName(QString::fromUtf8("label_2"));
-        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy2.setHorizontalStretch(2);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
-        label_2->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(2);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
+        label_2->setSizePolicy(sizePolicy1);
         label_2->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_2->addWidget(label_2);
 
-        label_3 = new QLabel(Widget);
+        label_3 = new QLabel(Client);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        sizePolicy1.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
-        label_3->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
+        label_3->setSizePolicy(sizePolicy);
         label_3->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_2->addWidget(label_3);
@@ -89,32 +84,37 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_2);
 
+        connectButton = new QPushButton(Client);
+        connectButton->setObjectName(QString::fromUtf8("connectButton"));
+
+        verticalLayout->addWidget(connectButton);
+
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        listWidget_2 = new QListWidget(Widget);
-        listWidget_2->setObjectName(QString::fromUtf8("listWidget_2"));
-        QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicy3.setHorizontalStretch(1);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(listWidget_2->sizePolicy().hasHeightForWidth());
-        listWidget_2->setSizePolicy(sizePolicy3);
-
-        horizontalLayout->addWidget(listWidget_2);
-
-        listWidget = new QListWidget(Widget);
+        listWidget = new QListWidget(Client);
         listWidget->setObjectName(QString::fromUtf8("listWidget"));
-        QSizePolicy sizePolicy4(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicy4.setHorizontalStretch(2);
-        sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(listWidget->sizePolicy().hasHeightForWidth());
-        listWidget->setSizePolicy(sizePolicy4);
+        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy2.setHorizontalStretch(1);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(listWidget->sizePolicy().hasHeightForWidth());
+        listWidget->setSizePolicy(sizePolicy2);
 
         horizontalLayout->addWidget(listWidget);
 
-        listWidget_3 = new QListWidget(Widget);
+        textBrowser = new QTextBrowser(Client);
+        textBrowser->setObjectName(QString::fromUtf8("textBrowser"));
+        QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy3.setHorizontalStretch(2);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(textBrowser->sizePolicy().hasHeightForWidth());
+        textBrowser->setSizePolicy(sizePolicy3);
+
+        horizontalLayout->addWidget(textBrowser);
+
+        listWidget_3 = new QListWidget(Client);
         listWidget_3->setObjectName(QString::fromUtf8("listWidget_3"));
-        sizePolicy3.setHeightForWidth(listWidget_3->sizePolicy().hasHeightForWidth());
-        listWidget_3->setSizePolicy(sizePolicy3);
+        sizePolicy2.setHeightForWidth(listWidget_3->sizePolicy().hasHeightForWidth());
+        listWidget_3->setSizePolicy(sizePolicy2);
 
         horizontalLayout->addWidget(listWidget_3);
 
@@ -123,47 +123,39 @@ public:
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        textToSendLineEdit = new QLineEdit(Widget);
-        textToSendLineEdit->setObjectName(QString::fromUtf8("textToSendLineEdit"));
-        QSizePolicy sizePolicy5(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy5.setHorizontalStretch(0);
-        sizePolicy5.setVerticalStretch(0);
-        sizePolicy5.setHeightForWidth(textToSendLineEdit->sizePolicy().hasHeightForWidth());
-        textToSendLineEdit->setSizePolicy(sizePolicy5);
+        sendMessageLineEdit = new QLineEdit(Client);
+        sendMessageLineEdit->setObjectName(QString::fromUtf8("sendMessageLineEdit"));
 
-        horizontalLayout_3->addWidget(textToSendLineEdit);
+        horizontalLayout_3->addWidget(sendMessageLineEdit);
 
-        pushButton = new QPushButton(Widget);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setCursor(QCursor(Qt::PointingHandCursor));
+        sendMessageButton = new QPushButton(Client);
+        sendMessageButton->setObjectName(QString::fromUtf8("sendMessageButton"));
 
-        horizontalLayout_3->addWidget(pushButton);
+        horizontalLayout_3->addWidget(sendMessageButton);
 
 
         verticalLayout->addLayout(horizontalLayout_3);
 
 
-        verticalLayout_2->addLayout(verticalLayout);
+        retranslateUi(Client);
 
-
-        retranslateUi(Widget);
-
-        QMetaObject::connectSlotsByName(Widget);
+        QMetaObject::connectSlotsByName(Client);
     } // setupUi
 
-    void retranslateUi(QWidget *Widget)
+    void retranslateUi(QWidget *Client)
     {
-        Widget->setWindowTitle(QCoreApplication::translate("Widget", "Widget", nullptr));
-        label->setText(QCoreApplication::translate("Widget", "Online Users", nullptr));
-        label_2->setText(QCoreApplication::translate("Widget", "Chat", nullptr));
-        label_3->setText(QCoreApplication::translate("Widget", "My Chats", nullptr));
-        pushButton->setText(QCoreApplication::translate("Widget", "Send Message", nullptr));
+        Client->setWindowTitle(QCoreApplication::translate("Client", "Form", nullptr));
+        label->setText(QCoreApplication::translate("Client", "Online Users", nullptr));
+        label_2->setText(QCoreApplication::translate("Client", "Current Chat", nullptr));
+        label_3->setText(QCoreApplication::translate("Client", "My Chats", nullptr));
+        connectButton->setText(QCoreApplication::translate("Client", "Connect", nullptr));
+        sendMessageButton->setText(QCoreApplication::translate("Client", "->", nullptr));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class Widget: public Ui_Widget {};
+    class Client: public Ui_Client {};
 } // namespace Ui
 
 QT_END_NAMESPACE

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ClientGui</class>
- <widget class="QWidget" name="ClientGui">
+ <class>Client</class>
+ <widget class="QWidget" name="Client">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>765</width>
-    <height>530</height>
+    <width>670</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="font">
@@ -72,7 +72,14 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <widget class="QPushButton" name="connectButton">
+     <property name="text">
+      <string>Connect</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QListWidget" name="listWidget">
        <property name="sizePolicy">
@@ -84,7 +91,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QListWidget" name="listWidget_2">
+      <widget class="QTextBrowser" name="textBrowser">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>2</horstretch>
@@ -106,17 +113,14 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="sendMessageLineEdit"/>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
+      <widget class="QPushButton" name="sendMessageButton">
        <property name="text">
-        <string>Send Message</string>
+        <string>-&gt;</string>
        </property>
       </widget>
      </item>

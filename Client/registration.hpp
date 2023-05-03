@@ -15,9 +15,7 @@ private:
 
 private slots:
     void on_showPasswordCheckBox_toggled(bool checked);
-
     void on_signUpButton_clicked();
-
     void on_signInButton_clicked();
 
 public:
