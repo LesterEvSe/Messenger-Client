@@ -13,10 +13,10 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -32,13 +32,15 @@ public:
     QLabel *label_2;
     QLineEdit *passwordLineEdit;
     QCheckBox *showPasswordCheckBox;
-    QDialogButtonBox *buttonBox;
+    QHBoxLayout *horizontalLayout_3;
+    QPushButton *signUpButton;
+    QPushButton *signInButton;
 
     void setupUi(QDialog *Registration)
     {
         if (Registration->objectName().isEmpty())
             Registration->setObjectName(QString::fromUtf8("Registration"));
-        Registration->resize(345, 164);
+        Registration->resize(345, 190);
         QFont font;
         font.setPointSize(14);
         font.setBold(false);
@@ -89,11 +91,20 @@ public:
 
         verticalLayout->addWidget(showPasswordCheckBox);
 
-        buttonBox = new QDialogButtonBox(Registration);
-        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
-        buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        signUpButton = new QPushButton(Registration);
+        signUpButton->setObjectName(QString::fromUtf8("signUpButton"));
 
-        verticalLayout->addWidget(buttonBox);
+        horizontalLayout_3->addWidget(signUpButton);
+
+        signInButton = new QPushButton(Registration);
+        signInButton->setObjectName(QString::fromUtf8("signInButton"));
+
+        horizontalLayout_3->addWidget(signInButton);
+
+
+        verticalLayout->addLayout(horizontalLayout_3);
 
 
         retranslateUi(Registration);
@@ -107,6 +118,8 @@ public:
         label->setText(QCoreApplication::translate("Registration", "Username", nullptr));
         label_2->setText(QCoreApplication::translate("Registration", "Password ", nullptr));
         showPasswordCheckBox->setText(QCoreApplication::translate("Registration", "Show Password", nullptr));
+        signUpButton->setText(QCoreApplication::translate("Registration", "Sign Up", nullptr));
+        signInButton->setText(QCoreApplication::translate("Registration", "Sign In", nullptr));
     } // retranslateUi
 
 };

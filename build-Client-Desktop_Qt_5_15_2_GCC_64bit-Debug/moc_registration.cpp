@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Registration_t {
     QByteArrayData data[6];
-    char stringdata0[98];
+    char stringdata0[102];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,13 +36,13 @@ QT_MOC_LITERAL(0, 0, 12), // "Registration"
 QT_MOC_LITERAL(1, 13, 31), // "on_showPasswordCheckBox_toggled"
 QT_MOC_LITERAL(2, 45, 0), // ""
 QT_MOC_LITERAL(3, 46, 7), // "checked"
-QT_MOC_LITERAL(4, 54, 21), // "on_buttonBox_accepted"
-QT_MOC_LITERAL(5, 76, 21) // "on_buttonBox_rejected"
+QT_MOC_LITERAL(4, 54, 23), // "on_signUpButton_clicked"
+QT_MOC_LITERAL(5, 78, 23) // "on_signInButton_clicked"
 
     },
     "Registration\0on_showPasswordCheckBox_toggled\0"
-    "\0checked\0on_buttonBox_accepted\0"
-    "on_buttonBox_rejected"
+    "\0checked\0on_signUpButton_clicked\0"
+    "on_signInButton_clicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -79,8 +79,8 @@ void Registration::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->on_showPasswordCheckBox_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 1: _t->on_buttonBox_accepted(); break;
-        case 2: _t->on_buttonBox_rejected(); break;
+        case 1: _t->on_signUpButton_clicked(); break;
+        case 2: _t->on_signInButton_clicked(); break;
         default: ;
         }
     }

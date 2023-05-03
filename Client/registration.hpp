@@ -13,13 +13,16 @@ class Registration : public QDialog
 private:
     Ui::Registration *ui;
 
+private slots:
+    void on_showPasswordCheckBox_toggled(bool checked);
+
+    void on_signUpButton_clicked();
+
+    void on_signInButton_clicked();
+
 public:
     explicit Registration(QWidget *parent = nullptr);
     ~Registration();
-private slots:
-    void on_showPasswordCheckBox_toggled(bool checked);
-    void on_buttonBox_accepted();
-    void on_buttonBox_rejected();
 };
 
 #endif // REGISTRATION_HPP

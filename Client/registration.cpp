@@ -23,15 +23,14 @@ void Registration::on_showPasswordCheckBox_toggled(bool checked)
         ui->passwordLineEdit->setEchoMode(QLineEdit::Password);
 }
 
-
-void Registration::on_buttonBox_accepted()
+void Registration::on_signUpButton_clicked()
 {
     accept();
 }
 
 
-void Registration::on_buttonBox_rejected()
+void Registration::on_signInButton_clicked()
 {
-    reject();
+    accept();
 }
 
