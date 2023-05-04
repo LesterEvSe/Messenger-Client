@@ -5,6 +5,8 @@
 #include <QMessageBox>
 #include <QDebug>
 
+bool Registration::isConnected = false;
+
 Registration::Registration(Client *client, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Registration),
@@ -33,20 +35,32 @@ void Registration::on_showPasswordCheckBox_toggled(bool checked)
 }
 
 void Registration::on_signUpButton_clicked() {
-    client->socket->connectToHost(QHostAddress::LocalHost, 1234);
+    if (isConnected)
+        connectedToServer();
+    else
+        client->socket->connectToHost(QHostAddress::LocalHost, 1234);
 }
 
 void Registration::on_signInButton_clicked() {
-    client->socket->connectToHost(QHostAddress::LocalHost, 1234);
+    if (isConnected)
+        connectedToServer();
+    else
+        client->socket->connectToHost(QHostAddress::LocalHost, 1234);
 }
 
 void Registration::connectedToServer()
 {
+    isConnected = true;
+
     QString username = ui->usernameLineEdit->text();
     QString password = ui->passwordLineEdit->text();
     ui->usernameLineEdit->clear();
     ui->passwordLineEdit->clear();
 
+    if (username.isEmpty() || password.isEmpty()) {
+        QMessageBox::warning(this, "Warning", "You need to fill in both input fields");
+        return;
+    }
     accept();
 }
 

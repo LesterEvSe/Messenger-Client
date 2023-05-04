@@ -28,7 +28,6 @@ private:
 private slots:
     void on_sendMessageButton_clicked();
     void on_sendMessageLineEdit_returnPressed();
-    void on_connectButton_clicked();
 
 public slots:
     void slotReadyRead();

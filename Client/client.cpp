@@ -98,7 +98,3 @@ void Client::on_sendMessageLineEdit_returnPressed() {
     sendToServer(ui->sendMessageLineEdit->text());
 }
 
-void Client::on_connectButton_clicked() {
-    socket->connectToHost(QHostAddress::LocalHost, 1234);
-}
-

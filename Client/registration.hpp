@@ -16,6 +16,7 @@ class Registration : public QDialog
 private:
     Ui::Registration *ui;
     Client *client;
+    static bool isConnected;
 
     void successfulConnection();
 
