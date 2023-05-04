@@ -4,10 +4,10 @@
 #include <QScreen>
 #include <QHostAddress>
 
-Client::Client(QWidget *parent) :
+Client::Client(QTcpSocket *shared_socket, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Client),
-    socket(new QTcpSocket(this)),
+    socket(shared_socket),
     nextBlockSize(0)
 {
     ui->setupUi(this);
@@ -82,11 +82,6 @@ void Client::slotReadyRead()
         nextBlockSize = 0;
         ui->textBrowser->append(time.toString() + " " + str);
     }
-}
-
-void Client::on_connectButton_clicked()
-{
-    socket->connectToHost(QHostAddress::LocalHost, 1234);
 }
 
 

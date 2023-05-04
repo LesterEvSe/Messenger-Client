@@ -23,7 +23,6 @@ private:
     void sendToServer(QString str);
 
 private slots:
-    void on_connectButton_clicked();
     void on_sendMessageButton_clicked();
     void on_sendMessageLineEdit_returnPressed();
 
@@ -31,7 +30,7 @@ public slots:
     void slotReadyRead();
 
 public:
-    explicit Client(QWidget *parent = nullptr);
+    explicit Client(QTcpSocket *shared_socket, QWidget *parent = nullptr);
     ~Client();
 };
 
