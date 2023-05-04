@@ -30,6 +30,7 @@ public:
     QLabel *label;
     QLabel *label_2;
     QLabel *label_3;
+    QPushButton *connectButton;
     QHBoxLayout *horizontalLayout;
     QListWidget *listWidget;
     QTextBrowser *textBrowser;
@@ -82,6 +83,11 @@ public:
 
 
         verticalLayout->addLayout(horizontalLayout_2);
+
+        connectButton = new QPushButton(Client);
+        connectButton->setObjectName(QString::fromUtf8("connectButton"));
+
+        verticalLayout->addWidget(connectButton);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -142,6 +148,7 @@ public:
         label->setText(QCoreApplication::translate("Client", "Online Users", nullptr));
         label_2->setText(QCoreApplication::translate("Client", "Current Chat", nullptr));
         label_3->setText(QCoreApplication::translate("Client", "My Chats", nullptr));
+        connectButton->setText(QCoreApplication::translate("Client", "Connect", nullptr));
         sendMessageButton->setText(QCoreApplication::translate("Client", "->", nullptr));
     } // retranslateUi
 

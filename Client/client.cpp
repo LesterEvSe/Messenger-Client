@@ -4,11 +4,11 @@
 #include <QScreen>
 #include <QHostAddress>
 
-Client::Client(QTcpSocket *shared_socket, QWidget *parent) :
+Client::Client(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Client),
-    socket(shared_socket),
-    nextBlockSize(0)
+    socket(new QTcpSocket(this)),
+    registration(new Registration(this))
 {
     ui->setupUi(this);
     setWindowTitle("Messenger");
@@ -22,8 +22,11 @@ Client::Client(QTcpSocket *shared_socket, QWidget *parent) :
     move((w - width())/2, (h - height())/2);
 }
 
-Client::~Client()
-{
+int Client::startRegistration() {
+    return registration->exec();
+}
+
+Client::~Client() {
     delete ui;
 }
 
@@ -50,6 +53,7 @@ void Client::sendToServer(QString str)
 void Client::slotReadyRead()
 {
     QDataStream in(socket);
+    quint16 nextBlockSize(0);
 
     // Specify the version to avoid errors
     in.setVersion(QDataStream::Qt_5_15);
@@ -85,13 +89,16 @@ void Client::slotReadyRead()
 }
 
 
-void Client::on_sendMessageButton_clicked()
-{
+void Client::on_sendMessageButton_clicked() {
     sendToServer(ui->sendMessageLineEdit->text());
 }
 
 
-void Client::on_sendMessageLineEdit_returnPressed()
-{
+void Client::on_sendMessageLineEdit_returnPressed() {
     sendToServer(ui->sendMessageLineEdit->text());
 }
+
+void Client::on_connectButton_clicked() {
+    socket->connectToHost(QHostAddress::LocalHost, 1234);
+}
+

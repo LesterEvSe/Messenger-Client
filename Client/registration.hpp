@@ -1,20 +1,21 @@
 #ifndef REGISTRATION_HPP
 #define REGISTRATION_HPP
 
+#include "client.hpp"
+
 #include <QDialog>
 #include <QTcpSocket>
 #include <QAbstractSocket>
 
-namespace Ui {
-class Registration;
-}
+class Client;
+namespace Ui { class Registration; }
 
 class Registration : public QDialog
 {
     Q_OBJECT
 private:
     Ui::Registration *ui;
-    QTcpSocket *socket;
+    Client *client;
 
     void successfulConnection();
 
@@ -27,7 +28,7 @@ private slots:
     void connectionError(QAbstractSocket::SocketError);
 
 public:
-    explicit Registration(QTcpSocket *shared_socket, QWidget *parent = nullptr);
+    explicit Registration(Client *client, QWidget *parent = nullptr);
     ~Registration();
 };
 

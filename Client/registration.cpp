@@ -5,13 +5,13 @@
 #include <QMessageBox>
 #include <QDebug>
 
-Registration::Registration(QTcpSocket *shared_socket, QWidget *parent) :
-    socket(shared_socket),
+Registration::Registration(Client *client, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Registration)
+    ui(new Ui::Registration),
+    client(client)
 {
-    connect(socket, SIGNAL(connected()), this, SLOT(connectedToServer()));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
+    connect(client->socket, SIGNAL(connected()), this, SLOT(connectedToServer()));
+    connect(client->socket, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(connectionError(QAbstractSocket::SocketError)));
 
     ui->setupUi(this);
@@ -33,11 +33,11 @@ void Registration::on_showPasswordCheckBox_toggled(bool checked)
 }
 
 void Registration::on_signUpButton_clicked() {
-    socket->connectToHost(QHostAddress::LocalHost, 1234);
+    client->socket->connectToHost(QHostAddress::LocalHost, 1234);
 }
 
 void Registration::on_signInButton_clicked() {
-    socket->connectToHost(QHostAddress::LocalHost, 1234);
+    client->socket->connectToHost(QHostAddress::LocalHost, 1234);
 }
 
 void Registration::connectedToServer()
@@ -47,12 +47,15 @@ void Registration::connectedToServer()
     ui->usernameLineEdit->clear();
     ui->passwordLineEdit->clear();
 
-    qDebug() << username << ' ' << password;
     accept();
 }
 
 void Registration::connectionError(QAbstractSocket::SocketError)
 {
+    QString username = ui->usernameLineEdit->text();
+    QString password = ui->passwordLineEdit->text();
+    ui->usernameLineEdit->clear();
+    ui->passwordLineEdit->clear();
     QMessageBox::critical(this, "Error", "Unable to connect to the server");
 }
 
