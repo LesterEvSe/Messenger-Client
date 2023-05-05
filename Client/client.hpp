@@ -22,6 +22,7 @@ private:
     QByteArray Data;
 
     Registration *registration;
+//    QString username;
 
     void sendToServer(QString str);
 

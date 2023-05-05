@@ -38,14 +38,14 @@ void Registration::on_signUpButton_clicked() {
     if (isConnected)
         connectedToServer();
     else
-        client->socket->connectToHost(QHostAddress::LocalHost, 1234);
+        client->socket->connectToHost(QHostAddress::LocalHost, 1326);
 }
 
 void Registration::on_signInButton_clicked() {
     if (isConnected)
         connectedToServer();
     else
-        client->socket->connectToHost(QHostAddress::LocalHost, 1234);
+        client->socket->connectToHost(QHostAddress::LocalHost, 1326);
 }
 
 void Registration::connectedToServer()

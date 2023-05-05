@@ -11,6 +11,7 @@ Client::Client(QWidget *parent) :
     registration(new Registration(this))
 {
     ui->setupUi(this);
+    ui->sendMessageLineEdit->setPlaceholderText("Write a message...");
     setWindowTitle("Messenger");
 
     connect(socket, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
