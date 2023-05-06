@@ -6,7 +6,7 @@
 #include <QWidget>
 #include <QTcpSocket>
 #include <QByteArray>
-#include <QTime>
+#include <QJsonObject>
 
 class Registration;
 namespace Ui { class Client; }
@@ -22,9 +22,9 @@ private:
     QByteArray Data;
 
     Registration *registration;
-//    QString username;
+    QString username;
 
-    void sendToServer(QString str);
+    void sendToServer(const QJsonObject& json);
 
 private slots:
     void on_sendMessageButton_clicked();

@@ -3,6 +3,8 @@
 
 #include <QScreen>
 #include <QHostAddress>
+#include <QTime>
+#include <QJsonDocument>
 
 Client::Client(QWidget *parent) :
     QWidget(parent),
@@ -33,12 +35,15 @@ Client::~Client() {
 
 
 
-void Client::sendToServer(QString str)
+void Client::sendToServer(const QJsonObject& json)
 {
     // Clean it up, because there may be trash in here
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_15);
+
+    QJsonDocument doc(json);
+    QString str = QString::fromUtf8(doc.toJson());
 
     // until we can determine the size of the block, we write 0
     // HERE IS THE MESSAGE OUTPUT
@@ -90,12 +95,23 @@ void Client::slotReadyRead()
 }
 
 
+// Next two functions are the same
+// Here we describe the JSON for sending messages from user
 void Client::on_sendMessageButton_clicked() {
-    sendToServer(ui->sendMessageLineEdit->text());
+
+    // For json["to"] need to make a special button
+    // or anything else. THINK ABOUT THIS
+    QJsonObject json;
+    json["type"] = "message";
+    json["from"] = username;
+    json["to"]   = "unknown"; // Our plug
+    json[""]     = ui->sendMessageLineEdit->text();
+
+    sendToServer(json);
 }
 
 
 void Client::on_sendMessageLineEdit_returnPressed() {
-    sendToServer(ui->sendMessageLineEdit->text());
+    on_sendMessageButton_clicked();
 }
 

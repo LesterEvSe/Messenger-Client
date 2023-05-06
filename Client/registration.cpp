@@ -3,6 +3,8 @@
 
 #include <QHostAddress>
 #include <QMessageBox>
+#include <QJsonObject>
+
 #include <QDebug>
 
 bool Registration::isConnected = false;
@@ -48,6 +50,7 @@ void Registration::on_signInButton_clicked() {
         client->socket->connectToHost(QHostAddress::LocalHost, 1326);
 }
 
+// Here our Json file
 void Registration::connectedToServer()
 {
     isConnected = true;
@@ -57,17 +60,26 @@ void Registration::connectedToServer()
     ui->usernameLineEdit->clear();
     ui->passwordLineEdit->clear();
 
-    if (username.isEmpty() || password.isEmpty()) {
+    if (username.isEmpty() || password.isEmpty())
         QMessageBox::warning(this, "Warning", "You need to fill in both input fields");
-        return;
+
+    else if (password.length() < 4)
+        QMessageBox::warning(this, "Warning", "The password must contain at least 4 characters");
+
+    else {
+        // This is our JSON for registraion
+        QJsonObject json;
+        json["type"] = "registration";
+        json["username"] = username;
+        json["password"] = password;
+
+        client->sendToServer(json);
+        accept();
     }
-    accept();
 }
 
 void Registration::connectionError(QAbstractSocket::SocketError)
 {
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
     ui->usernameLineEdit->clear();
     ui->passwordLineEdit->clear();
     QMessageBox::critical(this, "Error", "Unable to connect to the server");
