@@ -6,7 +6,9 @@
 #include <QDialog>
 #include <QTcpSocket>
 #include <QAbstractSocket>
+#include <QJsonObject>
 
+// Declaring a Client class that is defined in other file
 class Client;
 namespace Ui { class Registration; }
 
@@ -17,6 +19,7 @@ private:
     Ui::Registration *ui;
     Client *client;
     static bool isConnected;
+    QJsonObject json;
 
     void successfulConnection();
 

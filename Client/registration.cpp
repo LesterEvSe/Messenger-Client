@@ -23,8 +23,7 @@ Registration::Registration(Client *client, QWidget *parent) :
     ui->passwordLineEdit->setEchoMode(QLineEdit::Password);
 }
 
-Registration::~Registration()
-{
+Registration::~Registration() {
     delete ui;
 }
 
@@ -37,6 +36,12 @@ void Registration::on_showPasswordCheckBox_toggled(bool checked)
 }
 
 void Registration::on_signUpButton_clicked() {
+    client->username = ui->usernameLineEdit->text();
+
+    json["type"]     = "registration";
+    json["username"] = ui->usernameLineEdit->text();
+    json["password"] = ui->passwordLineEdit->text();
+
     if (isConnected)
         connectedToServer();
     else
@@ -44,38 +49,25 @@ void Registration::on_signUpButton_clicked() {
 }
 
 void Registration::on_signInButton_clicked() {
+    client->username = ui->usernameLineEdit->text();
+
+    json["type"]     = "login";
+    json["username"] = ui->usernameLineEdit->text();
+    json["password"] = ui->passwordLineEdit->text();
+
     if (isConnected)
         connectedToServer();
     else
         client->socket->connectToHost(QHostAddress::LocalHost, 1326);
 }
 
-// Here our Json file
+// The verdict will be rendered, in the Client::slotReadyRead()
 void Registration::connectedToServer()
 {
     isConnected = true;
-
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
     ui->usernameLineEdit->clear();
     ui->passwordLineEdit->clear();
-
-    if (username.isEmpty() || password.isEmpty())
-        QMessageBox::warning(this, "Warning", "You need to fill in both input fields");
-
-    else if (password.length() < 4)
-        QMessageBox::warning(this, "Warning", "The password must contain at least 4 characters");
-
-    else {
-        // This is our JSON for registraion
-        QJsonObject json;
-        json["type"] = "registration";
-        json["username"] = username;
-        json["password"] = password;
-
-        client->sendToServer(json);
-        accept();
-    }
+    client->sendToServer(json);
 }
 
 void Registration::connectionError(QAbstractSocket::SocketError)

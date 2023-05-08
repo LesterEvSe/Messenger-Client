@@ -3,8 +3,8 @@
 
 #include <QScreen>
 #include <QHostAddress>
-#include <QTime>
 #include <QJsonDocument>
+#include <QMessageBox>
 
 Client::Client(QWidget *parent) :
     QWidget(parent),
@@ -14,7 +14,6 @@ Client::Client(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->sendMessageLineEdit->setPlaceholderText("Write a message...");
-    setWindowTitle("Messenger");
 
     connect(socket, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
@@ -35,63 +34,30 @@ Client::~Client() {
 
 
 
-void Client::sendToServer(const QJsonObject& json)
+void Client::sendToServer(const QJsonObject& message)
 {
-    // Clean it up, because there may be trash in here
-    Data.clear();
-    QDataStream out(&Data, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_15);
-
-    QJsonDocument doc(json);
-    QString str = QString::fromUtf8(doc.toJson());
-
-    // until we can determine the size of the block, we write 0
-    // HERE IS THE MESSAGE OUTPUT
-    out << quint16(0) << QTime::currentTime() << str;
-    out.device()->seek(0);
-
-    // The first two bits are separators
-    out << quint16(Data.size() - sizeof(quint16));
-    socket->write(Data);
-    ui->sendMessageLineEdit->clear();
+    QJsonDocument doc(message);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    socket->write(data);
 }
 
 void Client::slotReadyRead()
 {
-    QDataStream in(socket);
-    quint16 nextBlockSize(0);
+    QByteArray data = socket->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    jsonData = doc.object();
 
-    // Specify the version to avoid errors
-    in.setVersion(QDataStream::Qt_5_15);
-    if (in.status() != QDataStream::Ok) {
-        ui->textBrowser->append("read error");
+    if (jsonData["message"].toString() == "message") {
+        ui->textBrowser->append(jsonData["message"].toString());
         return;
     }
 
-    // We do not know if the data will come in full or in parts,
-    // so we need an endless loop
-
-    // while(true) gives a warning,
-    // so change to the for loop
-    for (;;) {
-        // Block size unknown (0)
-        if (nextBlockSize == 0) {
-            if (socket->bytesAvailable() < 2)
-                break;
-            in >> nextBlockSize;
-        }
-        // if the data is incomplete
-        if (socket->bytesAvailable() < nextBlockSize)
-            break;
-
-        QString str;
-        QTime time;
-        in >> time >> str;
-
-        // To be able to receive new messages
-        nextBlockSize = 0;
-        ui->textBrowser->append(time.toString() + " " + str);
+    if (jsonData["isCorrect"].toBool()) {
+        setWindowTitle(username);
+        registration->accept();
     }
+    else
+        QMessageBox::warning(this, "Warning", jsonData["feedback"].toString());
 }
 
 
@@ -102,11 +68,13 @@ void Client::on_sendMessageButton_clicked() {
     // For json["to"] need to make a special button
     // or anything else. THINK ABOUT THIS
     QJsonObject json;
-    json["type"] = "message";
-    json["from"] = username;
-    json["to"]   = "unknown"; // Our plug
-    json[""]     = ui->sendMessageLineEdit->text();
+    json["type"]    = "message";
+    json["from"]    = username;
+    json["to"]      = "unknown"; // Our plug
+    json["message"] = ui->sendMessageLineEdit->text();
 
+    ui->textBrowser->append(ui->sendMessageLineEdit->text());
+    ui->sendMessageLineEdit->clear();
     sendToServer(json);
 }
 

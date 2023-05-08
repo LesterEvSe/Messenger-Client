@@ -8,6 +8,7 @@
 #include <QByteArray>
 #include <QJsonObject>
 
+// Declaring a Registration class that is defined in other file
 class Registration;
 namespace Ui { class Client; }
 
@@ -19,12 +20,12 @@ class Client : public QWidget
 private:
     Ui::Client *ui;
     QTcpSocket *socket;
-    QByteArray Data;
+    QJsonObject jsonData;
 
     Registration *registration;
     QString username;
 
-    void sendToServer(const QJsonObject& json);
+    void sendToServer(const QJsonObject& message);
 
 private slots:
     void on_sendMessageButton_clicked();
