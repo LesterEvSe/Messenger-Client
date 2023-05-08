@@ -14,8 +14,8 @@ Registration::Registration(Client *client, QWidget *parent) :
     ui(new Ui::Registration),
     client(client)
 {
-    connect(client->socket, SIGNAL(connected()), this, SLOT(connectedToServer()));
-    connect(client->socket, SIGNAL(error(QAbstractSocket::SocketError)),
+    connect(client->m_socket, SIGNAL(connected()), this, SLOT(connectedToServer()));
+    connect(client->m_socket, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(connectionError(QAbstractSocket::SocketError)));
 
     ui->setupUi(this);
@@ -36,7 +36,7 @@ void Registration::on_showPasswordCheckBox_toggled(bool checked)
 }
 
 void Registration::on_signUpButton_clicked() {
-    client->username = ui->usernameLineEdit->text();
+    client->m_username = ui->usernameLineEdit->text();
 
     json["type"]     = "registration";
     json["username"] = ui->usernameLineEdit->text();
@@ -45,11 +45,11 @@ void Registration::on_signUpButton_clicked() {
     if (isConnected)
         connectedToServer();
     else
-        client->socket->connectToHost(QHostAddress::LocalHost, 1326);
+        client->m_socket->connectToHost(QHostAddress::LocalHost, 1326);
 }
 
 void Registration::on_signInButton_clicked() {
-    client->username = ui->usernameLineEdit->text();
+    client->m_username = ui->usernameLineEdit->text();
 
     json["type"]     = "login";
     json["username"] = ui->usernameLineEdit->text();
@@ -58,7 +58,7 @@ void Registration::on_signInButton_clicked() {
     if (isConnected)
         connectedToServer();
     else
-        client->socket->connectToHost(QHostAddress::LocalHost, 1326);
+        client->m_socket->connectToHost(QHostAddress::LocalHost, 1326);
 }
 
 // The verdict will be rendered, in the Client::slotReadyRead()

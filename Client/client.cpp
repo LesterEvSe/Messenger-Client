@@ -5,18 +5,20 @@
 #include <QHostAddress>
 #include <QJsonDocument>
 #include <QMessageBox>
+#include <QDataStream>
 
 Client::Client(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Client),
-    socket(new QTcpSocket(this)),
-    registration(new Registration(this))
+    m_socket(new QTcpSocket(this)),
+    m_block_size(0),
+    m_registration(new Registration(this))
 {
     ui->setupUi(this);
     ui->sendMessageLineEdit->setPlaceholderText("Write a message...");
 
-    connect(socket, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
-    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
+    connect(m_socket, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
+    connect(m_socket, &QTcpSocket::disconnected, m_socket, &QTcpSocket::deleteLater);
 
     QRect screenGeometry = QApplication::primaryScreen()->geometry();
     int w = screenGeometry.width();
@@ -25,7 +27,7 @@ Client::Client(QWidget *parent) :
 }
 
 int Client::startRegistration() {
-    return registration->exec();
+    return m_registration->exec();
 }
 
 Client::~Client() {
@@ -36,16 +38,43 @@ Client::~Client() {
 
 void Client::sendToServer(const QJsonObject& message)
 {
-    QJsonDocument doc(message);
-    QByteArray data = doc.toJson(QJsonDocument::Compact);
-    socket->write(data);
+    QByteArray data = QJsonDocument(message).toJson(QJsonDocument::Compact);
+    QDataStream out(m_socket);
+    out.setVersion(QDataStream::Qt_5_15);
+
+    out << quint16(data.size());
+    out.writeRawData(data.constData(), data.size());
+
+    // Forcing all data to be sent at once
+    // to avoid multithreading problems when data accumulate in the buffer
+    m_socket->flush();
 }
 
 void Client::slotReadyRead()
 {
-    QByteArray data = socket->readAll();
+    // First of all we read the size of the message to be transmitted
+    QDataStream in(m_socket);
+    in.setVersion(QDataStream::Qt_5_15);
+
+    if (m_block_size == 0) {
+        if (m_socket->bytesAvailable() < static_cast<qint64>(sizeof(m_block_size)))
+            return;
+        in >> m_block_size;
+    }
+
+    // if the data came in less than agreed
+    if (m_socket->bytesAvailable() < m_block_size)
+        return;
+
+    // when we got the size, then we get our data
+    QByteArray data = m_socket->read(m_block_size);
     QJsonDocument doc = QJsonDocument::fromJson(data);
-    jsonData = doc.object();
+    QJsonObject jsonData = doc.object();
+
+    // Reset the variable to zero
+    // so that we can read the following message
+    m_block_size = 0;
+
 
     if (jsonData["message"].toString() == "message") {
         ui->textBrowser->append(jsonData["message"].toString());
@@ -53,8 +82,8 @@ void Client::slotReadyRead()
     }
 
     if (jsonData["isCorrect"].toBool()) {
-        setWindowTitle(username);
-        registration->accept();
+        setWindowTitle(m_username);
+        m_registration->accept();
     }
     else
         QMessageBox::warning(this, "Warning", jsonData["feedback"].toString());
@@ -69,7 +98,7 @@ void Client::on_sendMessageButton_clicked() {
     // or anything else. THINK ABOUT THIS
     QJsonObject json;
     json["type"]    = "message";
-    json["from"]    = username;
+    json["from"]    = m_username;
     json["to"]      = "unknown"; // Our plug
     json["message"] = ui->sendMessageLineEdit->text();
 

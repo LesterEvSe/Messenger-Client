@@ -19,11 +19,11 @@ class Client : public QWidget
 
 private:
     Ui::Client *ui;
-    QTcpSocket *socket;
-    QJsonObject jsonData;
+    QTcpSocket *m_socket;
+    quint32 m_block_size;
 
-    Registration *registration;
-    QString username;
+    Registration *m_registration;
+    QString m_username;
 
     void sendToServer(const QJsonObject& message);
 
