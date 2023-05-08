@@ -20,7 +20,7 @@ class Client : public QWidget
 private:
     Ui::Client *ui;
     QTcpSocket *m_socket;
-    quint32 m_block_size;
+    qint64 m_block_size;
 
     Registration *m_registration;
     QString m_username;

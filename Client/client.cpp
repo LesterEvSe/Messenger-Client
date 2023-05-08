@@ -40,9 +40,15 @@ void Client::sendToServer(const QJsonObject& message)
 {
     QByteArray data = QJsonDocument(message).toJson(QJsonDocument::Compact);
     QDataStream out(m_socket);
+
+    // To avoid errors, as it is constantly updated
     out.setVersion(QDataStream::Qt_5_15);
 
-    out << quint16(data.size());
+    // Write the size of transferred data in the SAME TYPE AS m_block_size,
+    // otherwise data will not be transferred correct!!!
+    out << decltype(m_block_size)(data.size());
+
+    // Writing data as "raw bytes" with size 'data.size()'
     out.writeRawData(data.constData(), data.size());
 
     // Forcing all data to be sent at once
