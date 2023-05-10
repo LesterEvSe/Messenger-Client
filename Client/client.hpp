@@ -7,6 +7,7 @@
 #include <QTcpSocket>
 #include <QByteArray>
 #include <QJsonObject>
+#include <QJsonArray>
 
 // Declaring a Registration class that is defined in other file
 class Registration;
@@ -25,11 +26,14 @@ private:
     Registration *m_registration;
     QString m_username;
 
+    void updateOnlineUsersUi(const QJsonArray& array);
     void sendToServer(const QJsonObject& message);
 
 private slots:
     void on_sendMessageButton_clicked();
     void on_sendMessageLineEdit_returnPressed();
+
+    void on_updateOnlineUsersButton_clicked();
 
 public slots:
     void slotReadyRead();

@@ -27,6 +27,15 @@ Client::Client(QWidget *parent) :
 }
 
 int Client::startRegistration() {
+    // Need to delete later and modify
+    // Otherwise, that's how you can get access to any account
+//    m_username = "Zhenia";
+//    setWindowTitle(m_username);
+
+//    m_socket->connectToHost(QHostAddress::LocalHost, 1326);
+//    m_registration->accept();
+//    return QDialog::Accepted;
+
     return m_registration->exec();
 }
 
@@ -34,8 +43,23 @@ Client::~Client() {
     delete ui;
 }
 
+// Frontend
+void Client::on_updateOnlineUsersButton_clicked()
+{
+    QJsonObject json;
+    json["type"] = "update online user";
+    sendToServer(json);
+}
+
+void Client::updateOnlineUsersUi(const QJsonArray& user_array)
+{
+    ui->onlineUsersListWidget->clear();
+    for (int i = 0; i < user_array.size(); ++i)
+        ui->onlineUsersListWidget->addItem(user_array.at(i).toString());
+}
 
 
+// Backend
 void Client::sendToServer(const QJsonObject& message)
 {
     QByteArray data = QJsonDocument(message).toJson(QJsonDocument::Compact);
@@ -82,12 +106,17 @@ void Client::slotReadyRead()
     m_block_size = 0;
 
 
-    if (jsonData["message"].toString() == "message") {
-        ui->textBrowser->append(jsonData["message"].toString());
-        return;
+    // Here need to add some GUI
+    // In the meantime, there will be a plug
+    if (jsonData["type"] == "message") {
+        ui->textBrowser->append(jsonData["from"].toString() + ": " +
+                jsonData["message"].toString());
     }
-
-    if (jsonData["isCorrect"].toBool()) {
+    else if (jsonData["type"] == "update online user") {
+        QJsonArray arr = jsonData["user array"].toArray();
+        updateOnlineUsersUi(arr);
+    }
+    else if (jsonData["isCorrect"].toBool()) {
         setWindowTitle(m_username);
         m_registration->accept();
     }
@@ -108,7 +137,6 @@ void Client::on_sendMessageButton_clicked() {
     json["to"]      = "unknown"; // Our plug
     json["message"] = ui->sendMessageLineEdit->text();
 
-    ui->textBrowser->append(ui->sendMessageLineEdit->text());
     ui->sendMessageLineEdit->clear();
     sendToServer(json);
 }
