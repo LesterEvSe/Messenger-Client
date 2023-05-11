@@ -9,6 +9,10 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+#include <QListWidget>
+#include <QHash>
+#include <QTextBrowser>
+
 // Declaring a Registration class that is defined in other file
 class Registration;
 namespace Ui { class Client; }
@@ -26,6 +30,12 @@ private:
     Registration *m_registration;
     QString m_username;
 
+    // Who we are communicating with now will determine the currChatLabel
+    // Here is the QString, the username with whom we are communicating
+    // We store a pair (index to the widget in the stack)
+    // and a pointer to the text browser in this index
+    QHash<QString, std::pair<QTextBrowser*, int>> m_chats;
+
     void updateOnlineUsersUi(const QJsonArray& array);
     void sendToServer(const QJsonObject& message);
 
@@ -34,6 +44,7 @@ private slots:
     void on_sendMessageLineEdit_returnPressed();
 
     void on_updateOnlineUsersButton_clicked();
+    void on_onlineUsersListWidget_itemClicked(QListWidgetItem *item);
 
 public slots:
     void slotReadyRead();

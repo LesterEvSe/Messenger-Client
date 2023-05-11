@@ -7,6 +7,8 @@
 #include <QMessageBox>
 #include <QDataStream>
 
+#include <QTextBrowser>
+
 Client::Client(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Client),
@@ -109,14 +111,24 @@ void Client::slotReadyRead()
     // Here need to add some GUI
     // In the meantime, there will be a plug
     if (jsonData["type"] == "message") {
-        ui->textBrowser->append(jsonData["from"].toString() + ": " +
-                jsonData["message"].toString());
+        m_chats[ui->currChatLabel->text()].first->append(
+            jsonData["from"].toString() + ": " + jsonData["message"].toString());
     }
     else if (jsonData["type"] == "update online user") {
         QJsonArray arr = jsonData["user array"].toArray();
         updateOnlineUsersUi(arr);
     }
     else if (jsonData["isCorrect"].toBool()) {
+        // Upon successful registration,
+        // we send a request to update users on the network
+        on_updateOnlineUsersButton_clicked();
+
+        // Chat with us is by default at the beginning
+        m_chats[m_username] = {ui->currUserTextBrowser, 0};
+
+        // Default chat is a chat with yourself
+        ui->currChatLabel->setText(m_username);
+
         setWindowTitle(m_username);
         m_registration->accept();
     }
@@ -145,4 +157,33 @@ void Client::on_sendMessageButton_clicked() {
 void Client::on_sendMessageLineEdit_returnPressed() {
     on_sendMessageButton_clicked();
 }
+
+#include <typeinfo>
+
+void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
+{
+    if (m_chats.find(item->text()) != m_chats.end()) {
+        ui->stackedWidget->setCurrentIndex(m_chats[item->text()].second);
+        ui->currChatLabel->setText(item->text());
+        return;
+    }
+
+    QTextBrowser *browser = new QTextBrowser(this);
+    m_chats[item->text()] = { browser, ui->stackedWidget->count() };
+    ui->currChatLabel->setText(item->text());
+
+    QWidget *widget = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->addWidget(browser);
+
+    ui->stackedWidget->addWidget(widget);
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->count() - 1);
+}
+
+
+
+
+
+
+
 
