@@ -60,6 +60,31 @@ void Client::updateOnlineUsersUi(const QJsonArray& user_array)
         ui->onlineUsersListWidget->addItem(user_array.at(i).toString());
 }
 
+void Client::receiveMessageUi(const QString& username) {
+    QTextBrowser *browser = new QTextBrowser(this);
+    m_chats[username] = { browser, ui->stackedWidget->count() };
+
+    QWidget *widget = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->addWidget(browser);
+
+    ui->stackedWidget->addWidget(widget);
+}
+
+void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
+{
+    if (m_chats.find(item->text()) != m_chats.end()) {
+        ui->stackedWidget->setCurrentIndex(m_chats[item->text()].second);
+        ui->currChatLabel->setText(item->text());
+        return;
+    }
+
+    // Order is important!
+    ui->currChatLabel->setText(item->text());
+    receiveMessageUi(ui->currChatLabel->text());
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->count() - 1);
+}
+
 
 // Backend
 void Client::sendToServer(const QJsonObject& message)
@@ -111,13 +136,20 @@ void Client::slotReadyRead()
     // Here need to add some GUI
     // In the meantime, there will be a plug
     if (jsonData["type"] == "message") {
-        m_chats[ui->currChatLabel->text()].first->append(
+        QString from = jsonData["from"].toString();
+
+        if (m_chats.find(from) == m_chats.end())
+            receiveMessageUi(from);
+
+        m_chats[from].first->append(
             jsonData["from"].toString() + ": " + jsonData["message"].toString());
     }
     else if (jsonData["type"] == "update online user") {
         QJsonArray arr = jsonData["user array"].toArray();
         updateOnlineUsersUi(arr);
     }
+
+    // Here jsonData["type"] is 'registration' or 'login'
     else if (jsonData["isCorrect"].toBool()) {
         // Upon successful registration,
         // we send a request to update users on the network
@@ -146,9 +178,13 @@ void Client::on_sendMessageButton_clicked() {
     QJsonObject json;
     json["type"]    = "message";
     json["from"]    = m_username;
-    json["to"]      = "unknown"; // Our plug
+    json["to"]      = ui->currChatLabel->text();
     json["message"] = ui->sendMessageLineEdit->text();
 
+    // We send our own part of the message to ourselves.
+    // Why strain the server?)
+    m_chats[ui->currChatLabel->text()].first->append(
+                m_username + ": " + ui->sendMessageLineEdit->text());
     ui->sendMessageLineEdit->clear();
     sendToServer(json);
 }
@@ -156,28 +192,6 @@ void Client::on_sendMessageButton_clicked() {
 
 void Client::on_sendMessageLineEdit_returnPressed() {
     on_sendMessageButton_clicked();
-}
-
-#include <typeinfo>
-
-void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
-{
-    if (m_chats.find(item->text()) != m_chats.end()) {
-        ui->stackedWidget->setCurrentIndex(m_chats[item->text()].second);
-        ui->currChatLabel->setText(item->text());
-        return;
-    }
-
-    QTextBrowser *browser = new QTextBrowser(this);
-    m_chats[item->text()] = { browser, ui->stackedWidget->count() };
-    ui->currChatLabel->setText(item->text());
-
-    QWidget *widget = new QWidget();
-    QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->addWidget(browser);
-
-    ui->stackedWidget->addWidget(widget);
-    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->count() - 1);
 }
 
 

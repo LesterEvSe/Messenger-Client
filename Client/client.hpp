@@ -36,6 +36,7 @@ private:
     // and a pointer to the text browser in this index
     QHash<QString, std::pair<QTextBrowser*, int>> m_chats;
 
+    void receiveMessageUi(const QString& username);
     void updateOnlineUsersUi(const QJsonArray& array);
     void sendToServer(const QJsonObject& message);
 
