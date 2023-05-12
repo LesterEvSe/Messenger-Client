@@ -36,16 +36,20 @@ private:
     // and a pointer to the text browser in this index
     QHash<QString, std::pair<QTextBrowser*, int>> m_chats;
 
-    void receiveMessageUi(const QString& username);
-    void updateOnlineUsersUi(const QJsonArray& array);
-    void sendToServer(const QJsonObject& message);
+    void receiveMessageUi    (const QString& username);
+    void updateOnlineUsersUi (const QJsonArray& array);
+    void sendToServer        (const QJsonObject& message);
+    void updateMyChats       (const QString& username);
 
 private slots:
-    void on_sendMessageButton_clicked();
-    void on_sendMessageLineEdit_returnPressed();
 
     void on_updateOnlineUsersButton_clicked();
+
     void on_onlineUsersListWidget_itemClicked(QListWidgetItem *item);
+    void on_myChatsListWidget_itemClicked    (QListWidgetItem *item);
+
+    void on_sendMessageButton_clicked();
+    void on_sendMessageLineEdit_returnPressed();
 
 public slots:
     void slotReadyRead();

@@ -1,12 +1,12 @@
 #include "client.hpp"
 #include "ui_client.h"
 
+// To display the window in the center (QApplication::primaryScreen())
 #include <QScreen>
 #include <QHostAddress>
 #include <QJsonDocument>
 #include <QMessageBox>
 #include <QDataStream>
-
 #include <QTextBrowser>
 
 Client::Client(QWidget *parent) :
@@ -74,8 +74,8 @@ void Client::receiveMessageUi(const QString& username) {
 void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
 {
     if (m_chats.find(item->text()) != m_chats.end()) {
-        ui->stackedWidget->setCurrentIndex(m_chats[item->text()].second);
-        ui->currChatLabel->setText(item->text());
+        // Using code already written
+        on_myChatsListWidget_itemClicked(item);
         return;
     }
 
@@ -85,8 +85,52 @@ void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
     ui->stackedWidget->setCurrentIndex(ui->stackedWidget->count() - 1);
 }
 
+// We know for a fact that in My Chats only those users
+// to whom we have written before are available
+void Client::on_myChatsListWidget_itemClicked(QListWidgetItem *item)
+{
+    ui->stackedWidget->setCurrentIndex(m_chats[item->text()].second);
+    ui->currChatLabel->setText(item->text());
+}
+
+// Next two functions are the same
+// Here we describe the JSON for sending messages from user
+void Client::on_sendMessageButton_clicked() {
+
+    QJsonObject json;
+    QString to      = ui->currChatLabel->text();
+
+    json["type"]    = "message";
+    json["from"]    = m_username;
+    json["to"]      = to;
+    json["message"] = ui->sendMessageLineEdit->text();
+
+    // We send our own part of the message to ourselves.
+    // Why strain the server?)
+    m_chats[to].first->append( m_username + ": " + ui->sendMessageLineEdit->text());
+    ui->sendMessageLineEdit->clear();
+
+    updateMyChats(to);
+    sendToServer(json);
+}
+
+void Client::on_sendMessageLineEdit_returnPressed() {
+    on_sendMessageButton_clicked();
+}
+
+
+
 
 // Backend
+void Client::updateMyChats(const QString& username) {
+    for (int i = 0; i < ui->myChatsListWidget->count(); ++i) {
+        QListWidgetItem *item = ui->myChatsListWidget->item(i);
+        if (item->text() == username)
+            return;
+    }
+    ui->myChatsListWidget->addItem(username);
+}
+
 void Client::sendToServer(const QJsonObject& message)
 {
     QByteArray data = QJsonDocument(message).toJson(QJsonDocument::Compact);
@@ -137,6 +181,7 @@ void Client::slotReadyRead()
     // In the meantime, there will be a plug
     if (jsonData["type"] == "message") {
         QString from = jsonData["from"].toString();
+        updateMyChats(from);
 
         if (m_chats.find(from) == m_chats.end())
             receiveMessageUi(from);
@@ -168,31 +213,6 @@ void Client::slotReadyRead()
         QMessageBox::warning(this, "Warning", jsonData["feedback"].toString());
 }
 
-
-// Next two functions are the same
-// Here we describe the JSON for sending messages from user
-void Client::on_sendMessageButton_clicked() {
-
-    // For json["to"] need to make a special button
-    // or anything else. THINK ABOUT THIS
-    QJsonObject json;
-    json["type"]    = "message";
-    json["from"]    = m_username;
-    json["to"]      = ui->currChatLabel->text();
-    json["message"] = ui->sendMessageLineEdit->text();
-
-    // We send our own part of the message to ourselves.
-    // Why strain the server?)
-    m_chats[ui->currChatLabel->text()].first->append(
-                m_username + ": " + ui->sendMessageLineEdit->text());
-    ui->sendMessageLineEdit->clear();
-    sendToServer(json);
-}
-
-
-void Client::on_sendMessageLineEdit_returnPressed() {
-    on_sendMessageButton_clicked();
-}
 
 
 
