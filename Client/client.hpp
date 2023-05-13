@@ -41,6 +41,9 @@ private:
     void sendToServer        (const QJsonObject& message);
     void updateMyChats       (const QString& username);
 
+    // Must be called after slotReadyRead
+    void determineMessage    (const QJsonObject& message);
+
 private slots:
 
     void on_updateOnlineUsersButton_clicked();

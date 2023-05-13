@@ -169,30 +169,31 @@ void Client::slotReadyRead()
     // Reset the variable to zero
     // so that we can read the following message
     m_block_size = 0;
+    determineMessage(jsonData);
+}
 
-
-    // Here need to add some GUI
-    // In the meantime, there will be a plug
-    if (jsonData["type"] == "message") {
-        QString from = jsonData["from"].toString();
+void Client::determineMessage(const QJsonObject &message)
+{
+    if (message["type"] == "message") {
+        QString from = message["from"].toString();
         updateMyChats(from);
 
         if (m_chats.find(from) == m_chats.end())
             receiveMessageUi(from);
 
         m_chats[from].first->append(
-            jsonData["from"].toString() + ": " + jsonData["message"].toString());
+            message["from"].toString() + ": " + message["message"].toString());
 
         // For a more readable conclusion. Empty row
         m_chats[from].first->append("");
     }
-    else if (jsonData["type"] == "update online users") {
-        QJsonArray arr = jsonData["array of users"].toArray();
+    else if (message["type"] == "update online users") {
+        QJsonArray arr = message["array of users"].toArray();
         updateOnlineUsersUi(arr);
     }
 
     // Here jsonData["type"] is 'registration' or 'login'
-    else if (jsonData["isCorrect"].toBool()) {
+    else if (message["isCorrect"].toBool()) {
         // Upon successful registration,
         // we send a request to update users on the network
         on_updateOnlineUsersButton_clicked();
@@ -207,7 +208,7 @@ void Client::slotReadyRead()
         m_registration->accept();
     }
     else
-        QMessageBox::warning(this, "Warning", jsonData["feedback"].toString());
+        QMessageBox::warning(this, "Warning", message["feedback"].toString());
 }
 
 
