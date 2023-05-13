@@ -40,7 +40,7 @@ Client::~Client() {
 void Client::on_updateOnlineUsersButton_clicked()
 {
     QJsonObject json;
-    json["type"] = "update online user";
+    json["type"] = "update online users";
     sendToServer(json);
 }
 
@@ -186,8 +186,8 @@ void Client::slotReadyRead()
         // For a more readable conclusion. Empty row
         m_chats[from].first->append("");
     }
-    else if (jsonData["type"] == "update online user") {
-        QJsonArray arr = jsonData["user array"].toArray();
+    else if (jsonData["type"] == "update online users") {
+        QJsonArray arr = jsonData["array of users"].toArray();
         updateOnlineUsersUi(arr);
     }
 
