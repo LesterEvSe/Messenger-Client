@@ -5,8 +5,6 @@
 #include <QMessageBox>
 #include <QJsonObject>
 
-#include <QDebug>
-
 bool Registration::isConnected = false;
 
 Registration::Registration(Client *client, QWidget *parent) :
@@ -75,5 +73,6 @@ void Registration::connectionError(QAbstractSocket::SocketError)
     ui->usernameLineEdit->clear();
     ui->passwordLineEdit->clear();
     QMessageBox::critical(this, "Error", "Unable to connect to the server");
+    exit(1);
 }
 
