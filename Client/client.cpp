@@ -29,15 +29,6 @@ Client::Client(QWidget *parent) :
 }
 
 int Client::startRegistration() {
-    // Need to delete later and modify
-    // Otherwise, that's how you can get access to any account
-//    m_username = "Zhenia";
-//    setWindowTitle(m_username);
-
-//    m_socket->connectToHost(QHostAddress::LocalHost, 1326);
-//    m_registration->accept();
-//    return QDialog::Accepted;
-
     return m_registration->exec();
 }
 
@@ -74,8 +65,8 @@ void Client::receiveMessageUi(const QString& username) {
 void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
 {
     if (m_chats.find(item->text()) != m_chats.end()) {
-        // Using code already written
-        on_myChatsListWidget_itemClicked(item);
+        ui->stackedWidget->setCurrentIndex(m_chats[item->text()].second);
+        ui->currChatLabel->setText(item->text());
         return;
     }
 
@@ -85,17 +76,17 @@ void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
     ui->stackedWidget->setCurrentIndex(ui->stackedWidget->count() - 1);
 }
 
-// We know for a fact that in My Chats only those users
-// to whom we have written before are available
-void Client::on_myChatsListWidget_itemClicked(QListWidgetItem *item)
-{
-    ui->stackedWidget->setCurrentIndex(m_chats[item->text()].second);
-    ui->currChatLabel->setText(item->text());
+// When we load chats from the database, not all windows may be open,
+// so we have to load those that have not been loaded
+void Client::on_myChatsListWidget_itemClicked(QListWidgetItem *item) {
+    on_onlineUsersListWidget_itemClicked(item);
 }
 
 // Next two functions are the same
 // Here we describe the JSON for sending messages from user
 void Client::on_sendMessageButton_clicked() {
+    if (ui->sendMessageLineEdit->text().isEmpty())
+        return;
 
     QJsonObject json;
     QString to      = ui->currChatLabel->text();
@@ -108,6 +99,9 @@ void Client::on_sendMessageButton_clicked() {
     // We send our own part of the message to ourselves.
     // Why strain the server?)
     m_chats[to].first->append( m_username + ": " + ui->sendMessageLineEdit->text());
+
+    // For a more readable conclusion. Empty row
+    m_chats[to].first->append("");
     ui->sendMessageLineEdit->clear();
 
     updateMyChats(to);
@@ -188,6 +182,9 @@ void Client::slotReadyRead()
 
         m_chats[from].first->append(
             jsonData["from"].toString() + ": " + jsonData["message"].toString());
+
+        // For a more readable conclusion. Empty row
+        m_chats[from].first->append("");
     }
     else if (jsonData["type"] == "update online user") {
         QJsonArray arr = jsonData["user array"].toArray();
