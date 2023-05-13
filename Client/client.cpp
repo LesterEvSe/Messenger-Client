@@ -29,6 +29,19 @@ Client::Client(QWidget *parent) :
 }
 
 int Client::startRegistration() {
+    // unauthorized access
+//    m_username = "Zhenia";
+//    m_chats[m_username] = { ui->currUserTextBrowser, 0 };
+
+//    // Default chat is a chat with yourself
+//    ui->currChatLabel->setText(m_username);
+
+//    setWindowTitle(m_username);
+//    m_registration->accept();
+
+//    m_socket->connectToHost(QHostAddress::LocalHost, 1326);
+//    return QDialog::Accepted;
+
     return m_registration->exec();
 }
 
@@ -41,6 +54,7 @@ void Client::on_updateOnlineUsersButton_clicked()
 {
     QJsonObject json;
     json["type"] = "update online users";
+    json["username"] = m_username;
     sendToServer(json);
 }
 
@@ -191,15 +205,35 @@ void Client::determineMessage(const QJsonObject &message)
         QJsonArray arr = message["array of users"].toArray();
         updateOnlineUsersUi(arr);
     }
+    else if (message["type"] == "download chats") {
+        QJsonArray user_array = message["array of users"].toArray();
+        for (int i = 0; i < user_array.size(); ++i)
+            ui->myChatsListWidget->addItem(user_array.at(i).toString());
+
+        /// Check Warning in the code block
+        /// no successful registration
+
+        // Upon successful registration/login,
+        // we send a request to update users on the network
+        on_updateOnlineUsersButton_clicked();
+    }
 
     // Here jsonData["type"] is 'registration' or 'login'
     else if (message["isCorrect"].toBool()) {
-        // Upon successful registration,
-        // we send a request to update users on the network
-        on_updateOnlineUsersButton_clicked();
+        // First request
+        // Also, we request a one-time update of all our available chats
+        QJsonObject json;
+        json["type"] = "download chats";
+        json["username"] = m_username;
+        sendToServer(json);
+
+        // Second request (update online users)
+        /// WARNING!!!
+        /// Do not send two requests at once, with successful registration,
+        /// otherwise KABOOM happens!
 
         // Chat with us is by default at the beginning
-        m_chats[m_username] = {ui->currUserTextBrowser, 0};
+        m_chats[m_username] = { ui->currUserTextBrowser, 0 };
 
         // Default chat is a chat with yourself
         ui->currChatLabel->setText(m_username);
