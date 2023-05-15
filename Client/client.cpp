@@ -49,7 +49,7 @@ void Client::updateOnlineUsersUi(const QJsonArray& user_array)
 {
     ui->onlineUsersListWidget->clear();
     for (int i = 0; i < user_array.size(); ++i)
-        ui->onlineUsersListWidget->addItem(user_array.at(i).toString());
+        ui->onlineUsersListWidget->addItem(user_array[i].toString());
 }
 
 void Client::receiveMessageUi(const QString& username) {
@@ -136,10 +136,6 @@ void Client::updateSelectedChat(const QJsonObject& chat)
     }
 }
 
-
-
-
-// Backend
 void Client::updateMyChats(const QString& username) {
     for (int i = 0; i < ui->myChatsListWidget->count(); ++i) {
         QListWidgetItem *item = ui->myChatsListWidget->item(i);
@@ -149,6 +145,11 @@ void Client::updateMyChats(const QString& username) {
     ui->myChatsListWidget->addItem(username);
 }
 
+
+
+
+
+// Backend
 void Client::sendToServer(const QJsonObject& message)
 {
     QByteArray data = QJsonDocument(message).toJson(QJsonDocument::Compact);
