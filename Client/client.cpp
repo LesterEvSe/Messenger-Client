@@ -29,19 +29,6 @@ Client::Client(QWidget *parent) :
 }
 
 int Client::startRegistration() {
-    // unauthorized access
-//    m_username = "Zhenia";
-//    m_chats[m_username] = { ui->currUserTextBrowser, 0 };
-
-//    // Default chat is a chat with yourself
-//    ui->currChatLabel->setText(m_username);
-
-//    setWindowTitle(m_username);
-//    m_registration->accept();
-
-//    m_socket->connectToHost(QHostAddress::LocalHost, 1326);
-//    return QDialog::Accepted;
-
     return m_registration->exec();
 }
 
@@ -87,6 +74,13 @@ void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
     // Order is important!
     ui->currChatLabel->setText(item->text());
     receiveMessageUi(ui->currChatLabel->text());
+
+    QJsonObject json;
+    json["type"] = "download correspondence";
+    json["username"] = m_username;
+    json["with"] = item->text();
+    sendToServer(json);
+
     ui->stackedWidget->setCurrentIndex(ui->stackedWidget->count() - 1);
 }
 
@@ -124,6 +118,22 @@ void Client::on_sendMessageButton_clicked() {
 
 void Client::on_sendMessageLineEdit_returnPressed() {
     on_sendMessageButton_clicked();
+}
+
+void Client::updateSelectedChat(const QJsonObject& chat)
+{
+    QJsonArray chat_array = chat["chat array"].toArray();
+    QJsonArray mess_num = chat["our messages_id"].toArray();
+    for (int coun = 0, our_mess_coun = 0; coun < chat_array.size(); ++coun)
+    {
+        QString nick;
+        if (coun == mess_num[our_mess_coun].toInt())
+            nick = ui->currChatLabel->text();
+        else
+            nick = m_username;
+        m_chats[ui->currChatLabel->text()].first->append(nick + ": " + chat_array[coun].toString());
+        m_chats[ui->currChatLabel->text()].first->append("");
+    }
 }
 
 
@@ -201,6 +211,9 @@ void Client::determineMessage(const QJsonObject &message)
         // For a more readable conclusion. Empty row
         m_chats[from].first->append("");
     }
+    else if (message["type"] == "download correspondence")
+        updateSelectedChat(message);
+
     else if (message["type"] == "update online users") {
         QJsonArray arr = message["array of users"].toArray();
         updateOnlineUsersUi(arr);
@@ -231,12 +244,6 @@ void Client::determineMessage(const QJsonObject &message)
         /// WARNING!!!
         /// Do not send two requests at once, with successful registration,
         /// otherwise KABOOM happens!
-
-        // Chat with us is by default at the beginning
-        m_chats[m_username] = { ui->currUserTextBrowser, 0 };
-
-        // Default chat is a chat with yourself
-        ui->currChatLabel->setText(m_username);
 
         setWindowTitle(m_username);
         m_registration->accept();

@@ -46,7 +46,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Current Chat</string>
+        <string>Choose Chat</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -148,7 +148,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QTextBrowser" name="currUserTextBrowser"/>
+          <widget class="QTextBrowser" name="textBrowser"/>
          </item>
         </layout>
        </widget>

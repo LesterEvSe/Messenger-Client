@@ -40,6 +40,7 @@ private:
     void updateOnlineUsersUi (const QJsonArray& array);
     void sendToServer        (const QJsonObject& message);
     void updateMyChats       (const QString& username);
+    void updateSelectedChat  (const QJsonObject& chat);
 
     // Must be called after slotReadyRead
     void determineMessage    (const QJsonObject& message);
