@@ -1,4 +1,6 @@
-QT       += core gui network
+QT          += core gui network
+LIBS        += -lgmp
+INCLUDEPATH += /usr/include
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,11 +12,13 @@ CONFIG += c++17
 
 SOURCES += \
     client.cpp \
+    encryption.cpp \
     main.cpp \
     registration.cpp
 
 HEADERS += \
     client.hpp \
+    encryption.hpp \
     registration.hpp
 
 FORMS += \
