@@ -39,16 +39,14 @@ Encryption::Encryption()
 const QString& Encryption::get_e() const { return e; }
 const QString& Encryption::get_n() const { return n; }
 
-// In this context, it would be more correct to use a raw pointer
-// to avoid problems with deletion in std::unique_ptr
 QString Encryption::toString(const mpz_class& num)
 {
     // +2 for '\0' and sign '-'
-    size_t buff_size = mpz_sizeinbase(num.get_mpz_t(), BASE + 2);
-    char* buff = new char[buff_size];
+    size_t buff_size = mpz_sizeinbase(num.get_mpz_t(), BASE) + 2;
+    std::unique_ptr<char[]> buff = std::make_unique<char[]>(buff_size);
 
-    mpz_get_str(buff, BASE, num.get_mpz_t());
-    return QString(buff);
+    mpz_get_str(buff.get(), BASE, num.get_mpz_t());
+    return buff.get();
 }
 
 mpz_class Encryption::createPrime()
@@ -94,3 +92,15 @@ mpz_class Encryption::createPrime()
 
     return prime;
 }
+
+QString Encryption::encrypt(const QString& str) const
+{
+
+}
+
+QString Encryption::decode(const QString& str) const
+{
+
+}
+
+

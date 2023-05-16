@@ -41,6 +41,9 @@ public:
 
     const QString& get_e() const;
     const QString& get_n() const;
+
+    QString encrypt(const QString& str) const;
+    QString decode (const QString& str) const;
 };
 
 #endif // ENCRYPTION_HPP
