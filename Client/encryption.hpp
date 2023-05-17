@@ -1,28 +1,27 @@
 #ifndef ENCRYPTION_HPP
 #define ENCRYPTION_HPP
 
+#include <gmpxx.h> // gmp.h for C
 #include <random>
 #include <QString>
-#include <gmpxx.h> // gmp.h for C
+#include <QByteArray>
 
 // Singleton class
 class Encryption
 {
 private:
-    static constexpr int BASE {10};
-
     // Can be changed, the higher the number,
     // the better the encryption
     static constexpr int BIT_ENCRYPTION {2048};
 
     // n = p * q, where p and q are prime numbers
-    QString n;
+    mpz_class n;
 
     // private key
-    QString d;
+    mpz_class d;
 
     // public key
-    QString e;
+    mpz_class e;
 
     static QString   toString(const mpz_class& num);
     static mpz_class createPrime();
@@ -39,11 +38,10 @@ public:
         return &rsa;
     }
 
-    const QString& get_e() const;
-    const QString& get_n() const;
+    QString get_e() const;
+    QString get_n() const;
 
-    QString encrypt(const QString& str) const;
-    QString decode (const QString& str) const;
+    QByteArray encode_decode(const QByteArray& str, bool encode) const;
 };
 
 #endif // ENCRYPTION_HPP

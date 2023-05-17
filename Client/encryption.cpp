@@ -11,7 +11,7 @@ Encryption::Encryption()
 //    qDebug() << "q " << toString(q);
 
     // 2. Calculate 'n'
-    n = toString(p * q);
+    n = p * q;
 //    qDebug() << "n " << n;
 
     // 3. Calculate 'fi(n)'
@@ -19,28 +19,25 @@ Encryption::Encryption()
 //    qDebug() << "fi(n) " << toString(fi_n);
 
     // 4. Selecting the recommended value of 'e'
-    mpz_class E(65537);
-    e = toString(E);
+    e = 65537;
 
     // 5. Calculate private key;
-    mpz_class D;
-
     // mpz_class is a C++ class wrapper, for the C structure mpz_t.
     // get_mpz_t() is needed to get a raw pointer to mpz_t
 
     // d * e % fi(n) = 1 therefore
     // d = (e^-1) % fi(n)
     // Modular Multiplicative Inverse here
-    mpz_invert(D.get_mpz_t(), E.get_mpz_t(), fi_n.get_mpz_t());
-    d = toString(D);
+    mpz_invert(d.get_mpz_t(), e.get_mpz_t(), fi_n.get_mpz_t());
 //    qDebug() << "d " << d;
 }
 
-const QString& Encryption::get_e() const { return e; }
-const QString& Encryption::get_n() const { return n; }
+QString Encryption::get_e() const { return toString(e); }
+QString Encryption::get_n() const { return toString(n); }
 
 QString Encryption::toString(const mpz_class& num)
 {
+    static constexpr int BASE {10};
     // +2 for '\0' and sign '-'
     size_t buff_size = mpz_sizeinbase(num.get_mpz_t(), BASE) + 2;
     std::unique_ptr<char[]> buff = std::make_unique<char[]>(buff_size);
@@ -93,14 +90,32 @@ mpz_class Encryption::createPrime()
     return prime;
 }
 
-QString Encryption::encrypt(const QString& str) const
+// encrypt, if true, otherwise decode
+QByteArray Encryption::encode_decode(const QByteArray& bytes, bool encode) const
 {
+    const unsigned char* data = reinterpret_cast<const unsigned char*>(bytes.data());
+    size_t num_bytes = static_cast<size_t>(bytes.size());
+    mpz_class num, res;
 
-}
+    // 1 - Little-Endian order (The least significant byte at the beginning)
+    // first 0  (endian) - Byte order for each item on a given platform
+    // second 0 (nails)  - Several low of each bytes that are not imported.
+    // All significant, so we import
+    mpz_import(num.get_mpz_t(), num_bytes, 1, sizeof(data[0]), 0, 0, data);
 
-QString Encryption::decode(const QString& str) const
-{
+    // res = num ^ e % n
+    if (encode)
+        mpz_powm(res.get_mpz_t(), num.get_mpz_t(), e.get_mpz_t(), n.get_mpz_t());
+    else
+        mpz_powm(res.get_mpz_t(), num.get_mpz_t(), d.get_mpz_t(), n.get_mpz_t());
 
+    // 256 is (1 << 8)
+    size_t res_size = mpz_sizeinbase(res.get_mpz_t(), 256);
+    std::unique_ptr<unsigned char[]> res_data = std::make_unique<unsigned char[]>(res_size);
+
+    size_t exported_size;
+    mpz_export(res_data.get(), &exported_size, 1, sizeof(res_data.get()[0]), 0, 0, res.get_mpz_t());
+    return QByteArray(reinterpret_cast<char*>(res_data.get()), static_cast<int>(exported_size));
 }
 
 
