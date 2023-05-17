@@ -1,5 +1,7 @@
 #include "encryption.hpp"
 #include <chrono> // for more accuracy in createPrime function
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QDebug> // need to delete later
 
 Encryption::Encryption()
@@ -100,7 +102,7 @@ QByteArray Encryption::encode_decode(const QByteArray& bytes, bool encode) const
     // 1 - Little-Endian order (The least significant byte at the beginning)
     // first 0  (endian) - Byte order for each item on a given platform
     // second 0 (nails)  - Several low of each bytes that are not imported.
-    // All significant, so we import
+    // All significant, so we import without skips
     mpz_import(num.get_mpz_t(), num_bytes, 1, sizeof(data[0]), 0, 0, data);
 
     // res = num ^ e % n
@@ -109,13 +111,21 @@ QByteArray Encryption::encode_decode(const QByteArray& bytes, bool encode) const
     else
         mpz_powm(res.get_mpz_t(), num.get_mpz_t(), d.get_mpz_t(), n.get_mpz_t());
 
-    // 256 is (1 << 8)
+    // 256 base system is (1 << 8)
     size_t res_size = mpz_sizeinbase(res.get_mpz_t(), 256);
     std::unique_ptr<unsigned char[]> res_data = std::make_unique<unsigned char[]>(res_size);
 
     size_t exported_size;
     mpz_export(res_data.get(), &exported_size, 1, sizeof(res_data.get()[0]), 0, 0, res.get_mpz_t());
-    return QByteArray(reinterpret_cast<char*>(res_data.get()), static_cast<int>(exported_size));
+
+    QByteArray answer(reinterpret_cast<char*>(res_data.get()), static_cast<int>(exported_size));
+    return answer;
 }
+
+
+
+
+
+
 
 

@@ -8,13 +8,15 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Encryption* obj = Encryption::get();
+    Encryption *obj = Encryption::get();
+
     QJsonObject json;
     json["type"] = "login";
-    json["message"] = "It works properly";
+    json["message"] = "Once upon a time";
 
     QByteArray bytes = QJsonDocument(json).toJson(QJsonDocument::Compact);
     qDebug() << bytes << "\n";
+    qDebug() << bytes.size();
     QByteArray encode = obj->encode_decode(bytes, true);
     qDebug() << encode << "\n";
 

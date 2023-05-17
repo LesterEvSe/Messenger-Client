@@ -14,6 +14,10 @@ private:
     // the better the encryption
     static constexpr int BIT_ENCRYPTION {2048};
 
+    // Module from the number 'n', which has 2*BIT_ENCRYPTION bits
+    // Get the number of bytes in the block
+    static constexpr int BLOCK_SIZE {2 * BIT_ENCRYPTION / 8};
+
     // n = p * q, where p and q are prime numbers
     mpz_class n;
 
@@ -40,8 +44,8 @@ public:
 
     QString get_e() const;
     QString get_n() const;
+    QByteArray encode_decode(const QByteArray& bytes, bool encode) const;
 
-    QByteArray encode_decode(const QByteArray& str, bool encode) const;
 };
 
 #endif // ENCRYPTION_HPP
