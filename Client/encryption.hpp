@@ -14,9 +14,11 @@ private:
     // the better the encryption
     static constexpr int BIT_ENCRYPTION {2048};
 
-    // Module from the number 'n', which has 2*BIT_ENCRYPTION bits
-    // Get the number of bytes in the block
-    static constexpr int BLOCK_SIZE {2 * BIT_ENCRYPTION / 8};
+    // Module from the number 'n', which has 2*BIT_ENCRYPTION bits.
+    // Get the number of bytes in the block.
+    // The recommended padding is 42 bytes for 512 bytes or 11 for 256
+    static constexpr int DECODE_BLOCK_SIZE {2 * BIT_ENCRYPTION / 8};
+    static constexpr int ENCODE_BLOCK_SIZE {DECODE_BLOCK_SIZE - 42};
 
     // n = p * q, where p and q are prime numbers
     mpz_class n;
@@ -29,6 +31,7 @@ private:
 
     static QString   toString(const mpz_class& num);
     static mpz_class createPrime();
+    QByteArray encode_decode_block_bytes(const QByteArray& bytes, bool encode) const;
 
     Encryption(const Encryption&)   = delete;
     Encryption(Encryption&&)        = delete;
@@ -44,7 +47,9 @@ public:
 
     QString get_e() const;
     QString get_n() const;
-    QByteArray encode_decode(const QByteArray& bytes, bool encode) const;
+
+    QByteArray encode(const QByteArray& bytes) const;
+    QByteArray decode(const QByteArray& bytes) const;
 
 };
 

@@ -93,7 +93,7 @@ mpz_class Encryption::createPrime()
 }
 
 // encrypt, if true, otherwise decode
-QByteArray Encryption::encode_decode(const QByteArray& bytes, bool encode) const
+QByteArray Encryption::encode_decode_block_bytes(const QByteArray& bytes, bool encode) const
 {
     const unsigned char* data = reinterpret_cast<const unsigned char*>(bytes.data());
     size_t num_bytes = static_cast<size_t>(bytes.size());
@@ -122,7 +122,25 @@ QByteArray Encryption::encode_decode(const QByteArray& bytes, bool encode) const
     return answer;
 }
 
+QByteArray Encryption::encode(const QByteArray& bytes) const
+{
+    QByteArray answer;
+    for (int i = 0; i < bytes.size(); i += ENCODE_BLOCK_SIZE) {
+        QByteArray block(bytes.mid(i, ENCODE_BLOCK_SIZE));
+        answer += encode_decode_block_bytes(block, true);
+    }
+    return answer;
+}
 
+QByteArray Encryption::decode(const QByteArray& bytes) const
+{
+    QByteArray answer;
+    for (int i = 0; i < bytes.size(); i += DECODE_BLOCK_SIZE) {
+        QByteArray block(bytes.mid(i, DECODE_BLOCK_SIZE));
+        answer += encode_decode_block_bytes(block, false);
+    }
+    return answer;
+}
 
 
 

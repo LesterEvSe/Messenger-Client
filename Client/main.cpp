@@ -12,15 +12,38 @@ int main(int argc, char *argv[])
 
     QJsonObject json;
     json["type"] = "login";
-    json["message"] = "Once upon a time";
+    json["message"] = "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time"
+                      "Once upon a timeOnce upon a timeOnce upon a timeOnce upon a timeOnce upon a time";
 
     QByteArray bytes = QJsonDocument(json).toJson(QJsonDocument::Compact);
     qDebug() << bytes << "\n";
     qDebug() << bytes.size();
-    QByteArray encode = obj->encode_decode(bytes, true);
+    QByteArray encode = obj->encode(bytes);
     qDebug() << encode << "\n";
 
-    QByteArray decode = obj->encode_decode(encode, false);
+    QByteArray decode = obj->decode(encode);
     qDebug() << decode;
 
 //    Client window;
