@@ -6,12 +6,13 @@
 #include <QWidget>
 #include <QTcpSocket>
 #include <QByteArray>
+#include <QTextBrowser>
+
 #include <QJsonObject>
 #include <QJsonArray>
 
 #include <QListWidget>
 #include <QHash>
-#include <QTextBrowser>
 
 // Declaring a Registration class that is defined in other file
 class Registration;
@@ -38,7 +39,7 @@ private:
 
     void receiveMessageUi    (const QString& username);
     void updateOnlineUsersUi (const QJsonArray& array);
-    void sendToServer        (const QJsonObject& message);
+    void sendToServer        (const QJsonObject& message) const;
     void updateMyChats       (const QString& username);
     void updateSelectedChat  (const QJsonObject& chat);
 

@@ -4,10 +4,11 @@
 // To display the window in the center (QApplication::primaryScreen())
 #include <QScreen>
 #include <QHostAddress>
-#include <QJsonDocument>
 #include <QMessageBox>
 #include <QDataStream>
-#include <QTextBrowser>
+
+#include <QJsonDocument>
+#include <QJsonParseError>
 
 Client::Client(QWidget *parent) :
     QWidget(parent),
@@ -150,7 +151,7 @@ void Client::updateMyChats(const QString& username) {
 
 
 // Backend
-void Client::sendToServer(const QJsonObject& message)
+void Client::sendToServer(const QJsonObject& message) const
 {
     QByteArray data = QJsonDocument(message).toJson(QJsonDocument::Compact);
     QDataStream out(m_socket);
@@ -252,12 +253,3 @@ void Client::determineMessage(const QJsonObject &message)
     else
         QMessageBox::warning(this, "Warning", message["feedback"].toString());
 }
-
-
-
-
-
-
-
-
-
