@@ -2,23 +2,19 @@
 #include <chrono> // for more accuracy in createPrime function
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QDebug> // need to delete later
+#include <string>
 
 Encryption::Encryption()
 {
     // 1. Generate 2 prime numbers
     mpz_class p = createPrime();
     mpz_class q = createPrime();
-//    qDebug() << "p " << toString(p);
-//    qDebug() << "q " << toString(q);
 
     // 2. Calculate 'n'
     n = p * q;
-//    qDebug() << "n " << n;
 
     // 3. Calculate 'fi(n)'
     mpz_class fi_n = (p - mpz_class(1)) * (q - mpz_class(1));
-//    qDebug() << "fi(n) " << toString(fi_n);
 
     // 4. Selecting the recommended value of 'e'
     e = 65537;
@@ -31,21 +27,14 @@ Encryption::Encryption()
     // d = (e^-1) % fi(n)
     // Modular Multiplicative Inverse here
     mpz_invert(d.get_mpz_t(), e.get_mpz_t(), fi_n.get_mpz_t());
-//    qDebug() << "d " << d;
 }
 
-QString Encryption::get_e() const { return toString(e); }
-QString Encryption::get_n() const { return toString(n); }
-
-QString Encryption::toString(const mpz_class& num)
+QByteArray Encryption::get_n() const
 {
-    static constexpr int BASE {10};
-    // +2 for '\0' and sign '-'
-    size_t buff_size = mpz_sizeinbase(num.get_mpz_t(), BASE) + 2;
-    std::unique_ptr<char[]> buff = std::make_unique<char[]>(buff_size);
+    std::string str = n.get_str();
 
-    mpz_get_str(buff.get(), BASE, num.get_mpz_t());
-    return buff.get();
+    // c_str return const char*
+    return QByteArray(str.c_str(), str.size());
 }
 
 mpz_class Encryption::createPrime()
@@ -93,7 +82,7 @@ mpz_class Encryption::createPrime()
 }
 
 // encrypt, if true, otherwise decode
-QByteArray Encryption::encode_decode_block_bytes(const QByteArray& bytes, bool encode) const
+QByteArray Encryption::encode_decode_block_bytes(const QByteArray& bytes, const QByteArray& key, bool encode) const
 {
     const unsigned char* data = reinterpret_cast<const unsigned char*>(bytes.data());
     size_t num_bytes = static_cast<size_t>(bytes.size());
@@ -106,8 +95,12 @@ QByteArray Encryption::encode_decode_block_bytes(const QByteArray& bytes, bool e
     mpz_import(num.get_mpz_t(), num_bytes, 1, sizeof(data[0]), 0, 0, data);
 
     // res = num ^ e % n
-    if (encode)
-        mpz_powm(res.get_mpz_t(), num.get_mpz_t(), e.get_mpz_t(), n.get_mpz_t());
+    if (encode) {
+        mpz_class mod;
+        mod.set_str(key.constData(), BASE);
+
+        mpz_powm(res.get_mpz_t(), num.get_mpz_t(), e.get_mpz_t(), mod.get_mpz_t());
+    }
     else
         mpz_powm(res.get_mpz_t(), num.get_mpz_t(), d.get_mpz_t(), n.get_mpz_t());
 
@@ -122,28 +115,27 @@ QByteArray Encryption::encode_decode_block_bytes(const QByteArray& bytes, bool e
     return answer;
 }
 
-QByteArray Encryption::encode(const QByteArray& bytes) const
+QByteArray Encryption::encode(const QByteArray& bytes, const QByteArray& key) const
 {
     QByteArray answer;
     for (int i = 0; i < bytes.size(); i += ENCODE_BLOCK_SIZE) {
         QByteArray block(bytes.mid(i, ENCODE_BLOCK_SIZE));
-        answer += encode_decode_block_bytes(block, true);
+        answer += encode_decode_block_bytes(block, key, true);
     }
     return answer;
 }
 
 QByteArray Encryption::decode(const QByteArray& bytes) const
 {
+    // We use OUR key for decoding, so we do not need the QByteArray parameter
+    // We pass in an empty.
+    QByteArray plug;
+
     QByteArray answer;
     for (int i = 0; i < bytes.size(); i += DECODE_BLOCK_SIZE) {
         QByteArray block(bytes.mid(i, DECODE_BLOCK_SIZE));
-        answer += encode_decode_block_bytes(block, false);
+        answer += encode_decode_block_bytes(block, plug, false);
     }
     return answer;
 }
-
-
-
-
-
 

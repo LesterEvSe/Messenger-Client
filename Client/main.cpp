@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     QByteArray bytes = QJsonDocument(json).toJson(QJsonDocument::Compact);
     qDebug() << bytes << "\n";
     qDebug() << bytes.size();
-    QByteArray encode = obj->encode(bytes);
+    QByteArray encode = obj->encode(bytes, obj->get_n());
     qDebug() << encode << "\n";
 
     QByteArray decode = obj->decode(encode);
