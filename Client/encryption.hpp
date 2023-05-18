@@ -40,7 +40,7 @@ private:
     Encryption();
 
 public:
-    static Encryption* get() {
+    static Encryption* get_instance() {
         static Encryption rsa = Encryption();
         return &rsa;
     }

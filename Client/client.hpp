@@ -2,6 +2,7 @@
 #define CLIENT_HPP
 
 #include "registration.hpp"
+#include "encryption.hpp"
 
 #include <QWidget>
 #include <QTcpSocket>
@@ -30,6 +31,11 @@ private:
 
     Registration *m_registration;
     QString m_username;
+
+    Encryption *m_encryption;
+
+    // Only this object can be changed in const functions
+    mutable QJsonObject m_message;
 
     // Who we are communicating with now will determine the currChatLabel
     // Here is the QString, the username with whom we are communicating
