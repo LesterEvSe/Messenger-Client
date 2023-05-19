@@ -1,12 +1,9 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "registration.hpp"
-#include "encryption.hpp"
+#include "clientback.hpp"
 
 #include <QWidget>
-#include <QTcpSocket>
-#include <QByteArray>
 #include <QTextBrowser>
 
 #include <QJsonObject>
@@ -16,26 +13,17 @@
 #include <QHash>
 
 // Declaring a Registration class that is defined in other file
-class Registration;
+class ClientBack;
 namespace Ui { class Client; }
 
 class Client : public QWidget
 {
     Q_OBJECT
-    friend class Registration;
+    friend class ClientBack;
 
 private:
     Ui::Client *ui;
-    QTcpSocket *m_socket;
-    qint64 m_block_size;
-
-    Registration *m_registration;
-    QString m_username;
-
-    Encryption *m_encryption;
-
-    // mutable - this object can be changed in const functions
-    mutable std::unique_ptr<QJsonObject> m_message;
+    ClientBack *m_client_back;
 
     // Who we are communicating with now will determine the currChatLabel
     // Here is the QString, the username with whom we are communicating
@@ -44,34 +32,26 @@ private:
     QHash<QString, std::pair<QTextBrowser*, int>> m_chats;
 
     void showWarning         (const QString& warning);
+    void showErrorAndExit    (const QString& error);
+
     void updateOnlineUsersUi (const QJsonArray& array);
     void processMessage      (const QJsonObject& message);
     void receiveMessageUi    (const QString& fromUser);
     void downloadChats       (const QJsonArray& userArray);
-
-    void sendToServer        (const QJsonObject& message) const;
     void updateMyChats       (const QString& username);
     void updateSelectedChat  (const QJsonObject& chat);
 
-    // Must be called after slotReadyRead
-    void determineMessage    (const QJsonObject& message);
-
 private slots:
-
     void on_updateOnlineUsersButton_clicked();
 
-    void on_onlineUsersListWidget_itemClicked(QListWidgetItem *item);
-    void on_myChatsListWidget_itemClicked    (QListWidgetItem *item);
+    void on_onlineUsersListWidget_itemClicked (QListWidgetItem *item);
+    void on_myChatsListWidget_itemClicked     (QListWidgetItem *item);
 
     void on_sendMessageButton_clicked();
     void on_sendMessageLineEdit_returnPressed();
 
-public slots:
-    void slotReadyRead();
-
 public:
-    explicit Client(QWidget *parent = nullptr);
-    int startRegistration();
+    explicit Client(ClientBack *clientBack, QWidget *parent = nullptr);
     ~Client();
 };
 

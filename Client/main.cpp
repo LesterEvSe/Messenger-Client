@@ -1,12 +1,12 @@
-#include "client.hpp"
+#include "clientback.hpp"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Client window;
+    ClientBack window;
     if (window.startRegistration() == QDialog::Accepted) {
-        window.show();
+        window.gui->show();
         return a.exec();
     }
     return 0;

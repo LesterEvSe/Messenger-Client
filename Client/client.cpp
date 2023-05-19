@@ -1,5 +1,5 @@
 #include "client.hpp"
-#include "ui_client.h"
+#include "ui_clientgui.h"
 
 // To display the window in the center (QApplication::primaryScreen())
 #include <QScreen>
@@ -10,21 +10,14 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 
-Client::Client(QWidget *parent) :
+
+Client::Client(ClientBack *clientBack, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Client),
-    m_socket(new QTcpSocket(this)),
-
-    m_block_size(0),
-
-    m_registration(new Registration(this)),
-    m_encryption(Encryption::get_instance())
+    m_client_back(clientBack)
 {
     ui->setupUi(this);
     ui->sendMessageLineEdit->setPlaceholderText("Write a message...");
-
-    connect(m_socket, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
-    connect(m_socket, &QTcpSocket::disconnected, m_socket, &QTcpSocket::deleteLater);
 
     QRect screenGeometry = QApplication::primaryScreen()->geometry();
     int w = screenGeometry.width();
@@ -32,11 +25,15 @@ Client::Client(QWidget *parent) :
     move((w - width())/2, (h - height())/2);
 }
 
-int Client::startRegistration() { return m_registration->exec(); }
 Client::~Client() { delete ui; }
 
 void Client::showWarning(const QString &warning) {
     QMessageBox::warning(this, "Warning", warning);
+}
+
+void Client::showErrorAndExit(const QString &error) {
+    QMessageBox::critical(this, "Error", error);
+    exit(1);
 }
 
 // Frontend
@@ -44,8 +41,8 @@ void Client::on_updateOnlineUsersButton_clicked()
 {
     QJsonObject json;
     json["type"] = "update online users";
-    json["username"] = m_username;
-    sendToServer(json);
+    json["username"] = m_client_back->m_username;
+    m_client_back->sendToServer(json);
 }
 
 void Client::updateOnlineUsersUi(const QJsonArray& user_array)
@@ -85,9 +82,9 @@ void Client::receiveMessageUi(const QString& fromUser)
     // If we are here, we definitely need to upload the corerspondence
     QJsonObject json;
     json["type"] = "download correspondence";
-    json["username"] = m_username;
+    json["username"] = m_client_back->m_username;
     json["with"] = fromUser;
-    sendToServer(json);
+    m_client_back->sendToServer(json);
 }
 
 void Client::downloadChats(const QJsonArray &userArray)
@@ -131,20 +128,20 @@ void Client::on_sendMessageButton_clicked()
     QString to      = ui->currChatLabel->text();
 
     json["type"]    = "message";
-    json["from"]    = m_username;
+    json["from"]    = m_client_back->m_username;
     json["to"]      = to;
     json["message"] = ui->sendMessageLineEdit->text();
 
     // We send our own part of the message to ourselves.
     // Why strain the server?)
-    m_chats[to].first->append( m_username + ": " + ui->sendMessageLineEdit->text());
+    m_chats[to].first->append(m_client_back->m_username + ": " + ui->sendMessageLineEdit->text());
 
     // For a more readable conclusion. Empty row
     m_chats[to].first->append("");
     ui->sendMessageLineEdit->clear();
 
     updateMyChats(to);
-    sendToServer(json);
+    m_client_back->sendToServer(json);
 }
 
 void Client::on_sendMessageLineEdit_returnPressed() {
@@ -161,7 +158,7 @@ void Client::updateSelectedChat(const QJsonObject& chat)
     {
         QString nick;
         if (!mess_num.empty() && coun == mess_num[our_mess_coun].toInt()) {
-            nick = m_username;
+            nick = m_client_back->m_username;
             ++our_mess_coun;
         }
         else
@@ -179,142 +176,4 @@ void Client::updateMyChats(const QString& username) {
             return;
     }
     ui->myChatsListWidget->addItem(username);
-}
-
-
-
-
-
-// Backend
-void Client::sendToServer(const QJsonObject& message) const
-{
-    QByteArray data;
-    if (message["type"] == "request a key") {
-        QJsonObject answer;
-        answer["type"] = "key";
-        answer["key"]  = QString::fromUtf8(m_encryption->get_n());
-        data = QJsonDocument(answer).toJson(QJsonDocument::Compact);
-    }
-    else if (message["type"] == "key") {
-        QByteArray cipher_key = message["key"].toString().toUtf8();
-        data = QJsonDocument(*m_message).toJson(QJsonDocument::Compact);
-
-        data = m_encryption->encode(data, cipher_key);
-        m_message = nullptr;
-    }
-
-    // Executed when m_message is empty
-    else {
-        m_message = std::make_unique<QJsonObject>(message);
-        QJsonObject request;
-        request["type"] = "request a key";
-        data = QJsonDocument(request).toJson(QJsonDocument::Compact);
-    }
-    // There is no fourth. Because if the message is NOT empty,
-    // then we have an encryption key (second block)
-
-    QDataStream out(m_socket);
-
-    // To avoid errors, as it is constantly updated
-    out.setVersion(QDataStream::Qt_5_15);
-
-    // Write the size of transferred data in the SAME TYPE AS m_block_size,
-    // otherwise data will not be transferred correct!!!
-    out << decltype(m_block_size)(data.size());
-
-    // Writing data as "raw bytes" with size 'data.size()'
-    out.writeRawData(data.constData(), data.size());
-
-    // Forcing all data to be sent at once
-    // to avoid multithreading problems when data accumulate in the buffer
-    m_socket->flush();
-}
-
-void Client::slotReadyRead()
-{
-    // First of all we read the size of the message to be transmitted
-    QDataStream in(m_socket);
-    in.setVersion(QDataStream::Qt_5_15);
-
-    if (m_block_size == 0) {
-        if (m_socket->bytesAvailable() < static_cast<qint64>(sizeof(m_block_size)))
-            return;
-        in >> m_block_size;
-    }
-
-    // if the data came in less than agreed
-    if (m_socket->bytesAvailable() < m_block_size)
-        return;
-
-    // when we got the size, then we get our data
-    QByteArray data = m_socket->read(m_block_size);
-
-    QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &error);
-
-    // If we caught the first error, then our data came in encrypted form
-    // Otherwise we get the key
-    if (error.error != QJsonParseError::NoError) {
-        data = m_encryption->decode(data);
-        doc = QJsonDocument::fromJson(data, &error);
-
-        // If after decryption we get an error
-        if (error.error != QJsonParseError::NoError) {
-            QMessageBox::critical(this, "Error", "Data reading error or key error");
-            exit(1);
-        }
-    }
-    QJsonObject jsonData = doc.object();
-
-    // Reset the variable to zero
-    // so that we can read the following message
-    m_block_size = 0;
-    determineMessage(jsonData);
-}
-
-void Client::determineMessage(const QJsonObject &message)
-{
-    if (message["type"] == "message")
-        processMessage(message);
-
-    // This is where we supposedly send the key back.
-    // However, in this function we encrypt m_message
-    // and send fully encrypted bytes
-    else if (message["type"] == "key" ||
-             message["type"] == "request a key")
-        sendToServer(message);
-
-    else if (message["type"] == "download correspondence")
-        updateSelectedChat(message);
-
-    else if (message["type"] == "update online users") {
-        QJsonArray arr = message["array of users"].toArray();
-        updateOnlineUsersUi(arr);
-    }
-    else if (message["type"] == "download chats") {
-        QJsonArray arr = message["array of users"].toArray();
-        downloadChats(arr);
-    }
-
-    // Here jsonData["type"] is 'registration' or 'login'
-    else if (message["isCorrect"].toBool()) {
-        // First request
-        // Also, we request a one-time update of all our available chats
-        QJsonObject json;
-        json["type"] = "download chats";
-        json["username"] = m_username;
-        sendToServer(json);
-
-        // Second request (update online users)
-        /// WARNING!!!
-        /// Do not send two requests at once, with successful registration,
-        /// otherwise KABOOM happens!
-
-        // In future. Use two pointers to appropriate class
-        // to do this
-        setWindowTitle(m_username);
-        m_registration->accept();
-    }
-    else
-        showWarning(message["feedback"].toString());
 }

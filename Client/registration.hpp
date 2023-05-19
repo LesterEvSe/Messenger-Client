@@ -1,7 +1,7 @@
 #ifndef REGISTRATION_HPP
 #define REGISTRATION_HPP
 
-#include "client.hpp"
+#include "clientback.hpp"
 
 #include <QDialog>
 #include <QTcpSocket>
@@ -9,7 +9,7 @@
 #include <QJsonObject>
 
 // Declaring a Client class that is defined in other file
-class Client;
+class ClientBack;
 namespace Ui { class Registration; }
 
 class Registration : public QDialog
@@ -17,9 +17,9 @@ class Registration : public QDialog
     Q_OBJECT
 private:
     Ui::Registration *ui;
-    Client *client;
-    QJsonObject json;
+    ClientBack *m_client_back;
 
+    QJsonObject m_json;
     static bool isConnected;
 
     void successfulConnection();
@@ -33,7 +33,7 @@ private slots:
     void connectionError(QAbstractSocket::SocketError);
 
 public:
-    explicit Registration(Client *client, QWidget *parent = nullptr);
+    explicit Registration(ClientBack *clientBack, QWidget *parent = nullptr);
     ~Registration();
 };
 

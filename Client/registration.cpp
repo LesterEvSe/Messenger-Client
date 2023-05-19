@@ -3,17 +3,16 @@
 
 #include <QHostAddress>
 #include <QMessageBox>
-#include <QJsonObject>
 
 bool Registration::isConnected = false;
 
-Registration::Registration(Client *client, QWidget *parent) :
+Registration::Registration(ClientBack *clientBack, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Registration),
-    client(client)
+    m_client_back(clientBack)
 {
-    connect(client->m_socket, SIGNAL(connected()), this, SLOT(connectedToServer()));
-    connect(client->m_socket, SIGNAL(error(QAbstractSocket::SocketError)),
+    connect(m_client_back->m_socket, SIGNAL(connected()), this, SLOT(connectedToServer()));
+    connect(m_client_back->m_socket, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(connectionError(QAbstractSocket::SocketError)));
 
     ui->setupUi(this);
@@ -21,9 +20,7 @@ Registration::Registration(Client *client, QWidget *parent) :
     ui->passwordLineEdit->setEchoMode(QLineEdit::Password);
 }
 
-Registration::~Registration() {
-    delete ui;
-}
+Registration::~Registration() { delete ui; }
 
 void Registration::on_showPasswordCheckBox_toggled(bool checked)
 {
@@ -34,38 +31,38 @@ void Registration::on_showPasswordCheckBox_toggled(bool checked)
 }
 
 void Registration::on_signUpButton_clicked() {
-    client->m_username = ui->usernameLineEdit->text();
+    m_client_back->m_username = ui->usernameLineEdit->text();
 
-    json["type"]     = "registration";
-    json["username"] = ui->usernameLineEdit->text();
-    json["password"] = ui->passwordLineEdit->text();
+    m_json["type"]     = "registration";
+    m_json["username"] = ui->usernameLineEdit->text();
+    m_json["password"] = ui->passwordLineEdit->text();
 
     if (isConnected)
         connectedToServer();
     else
-        client->m_socket->connectToHost(QHostAddress::LocalHost, 1326);
+        m_client_back->m_socket->connectToHost(QHostAddress::LocalHost, 1326);
 }
 
 void Registration::on_signInButton_clicked() {
-    client->m_username = ui->usernameLineEdit->text();
+    m_client_back->m_username = ui->usernameLineEdit->text();
 
-    json["type"]     = "login";
-    json["username"] = ui->usernameLineEdit->text();
-    json["password"] = ui->passwordLineEdit->text();
+    m_json["type"]     = "login";
+    m_json["username"] = ui->usernameLineEdit->text();
+    m_json["password"] = ui->passwordLineEdit->text();
 
     if (isConnected)
         connectedToServer();
     else
-        client->m_socket->connectToHost(QHostAddress::LocalHost, 1326);
+        m_client_back->m_socket->connectToHost(QHostAddress::LocalHost, 1326);
 }
 
-// The verdict will be rendered, in the Client::slotReadyRead()
+// The verdict will be rendered, in the ClientBack::slotReadyRead()
 void Registration::connectedToServer()
 {
     isConnected = true;
     ui->usernameLineEdit->clear();
     ui->passwordLineEdit->clear();
-    client->sendToServer(json);
+    m_client_back->sendToServer(m_json);
 }
 
 void Registration::connectionError(QAbstractSocket::SocketError)
@@ -75,4 +72,3 @@ void Registration::connectionError(QAbstractSocket::SocketError)
     QMessageBox::critical(this, "Error", "Unable to connect to the server");
     exit(1);
 }
-
