@@ -51,15 +51,23 @@ void Client::updateOnlineUsersUi(const QJsonArray& user_array)
         ui->onlineUsersListWidget->addItem(user_array[i].toString());
 }
 
-void Client::receiveMessageUi(const QString& username) {
+void Client::receiveMessageUi(const QString& fromUser)
+{
     QTextBrowser *browser = new QTextBrowser(this);
-    m_chats[username] = { browser, ui->stackedWidget->count() };
+    m_chats[fromUser] = { browser, ui->stackedWidget->count() };
 
     QWidget *widget = new QWidget();
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->addWidget(browser);
 
     ui->stackedWidget->addWidget(widget);
+
+    // If we are here, we definitely need to upload the corerspondence
+    QJsonObject json;
+    json["type"] = "download correspondence";
+    json["username"] = m_username;
+    json["with"] = fromUser;
+    sendToServer(json);
 }
 
 void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
@@ -73,13 +81,6 @@ void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
     // Order is important!
     ui->currChatLabel->setText(item->text());
     receiveMessageUi(ui->currChatLabel->text());
-
-    QJsonObject json;
-    json["type"] = "download correspondence";
-    json["username"] = m_username;
-    json["with"] = item->text();
-    sendToServer(json);
-
     ui->stackedWidget->setCurrentIndex(ui->stackedWidget->count() - 1);
 }
 
@@ -123,6 +124,8 @@ void Client::updateSelectedChat(const QJsonObject& chat)
 {
     QJsonArray chat_array = chat["chat array"].toArray();
     QJsonArray mess_num = chat["our messages_id"].toArray();
+    QString with = chat["with"].toString();
+
     for (int coun = 0, our_mess_coun = 0; coun < chat_array.size(); ++coun)
     {
         QString nick;
@@ -131,10 +134,10 @@ void Client::updateSelectedChat(const QJsonObject& chat)
             ++our_mess_coun;
         }
         else
-            nick = ui->currChatLabel->text();
+            nick = with;
 
-        m_chats[ui->currChatLabel->text()].first->append(nick + ": " + chat_array[coun].toString());
-        m_chats[ui->currChatLabel->text()].first->append("");
+        m_chats[with].first->append(nick + ": " + chat_array[coun].toString());
+        m_chats[with].first->append("");
     }
 }
 
@@ -244,8 +247,10 @@ void Client::determineMessage(const QJsonObject &message)
         QString from = message["from"].toString();
         updateMyChats(from);
 
-        if (m_chats.find(from) == m_chats.end())
+        if (!m_chats.contains(from)) {
             receiveMessageUi(from);
+            return;
+        }
 
         m_chats[from].first->append(
             message["from"].toString() + ": " + message["message"].toString());
