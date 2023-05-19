@@ -35,6 +35,10 @@ Client::Client(QWidget *parent) :
 int Client::startRegistration() { return m_registration->exec(); }
 Client::~Client() { delete ui; }
 
+void Client::showWarning(const QString &warning) {
+    QMessageBox::warning(this, "Warning", warning);
+}
+
 // Frontend
 void Client::on_updateOnlineUsersButton_clicked()
 {
@@ -49,6 +53,22 @@ void Client::updateOnlineUsersUi(const QJsonArray& user_array)
     ui->onlineUsersListWidget->clear();
     for (int i = 0; i < user_array.size(); ++i)
         ui->onlineUsersListWidget->addItem(user_array[i].toString());
+}
+
+void Client::processMessage(const QJsonObject& message)
+{
+    QString from = message["from"].toString();
+    updateMyChats(from);
+
+    if (!m_chats.contains(from)) {
+        receiveMessageUi(from);
+        return;
+    }
+
+    m_chats[from].first->append(from + ": " + message["message"].toString());
+
+    // For a more readable conclusion. Empty row
+    m_chats[from].first->append("");
 }
 
 void Client::receiveMessageUi(const QString& fromUser)
@@ -68,6 +88,16 @@ void Client::receiveMessageUi(const QString& fromUser)
     json["username"] = m_username;
     json["with"] = fromUser;
     sendToServer(json);
+}
+
+void Client::downloadChats(const QJsonArray &userArray)
+{
+    for (int i = 0; i < userArray.size(); ++i)
+        ui->myChatsListWidget->addItem(userArray[i].toString());
+
+    // Upon successful registration/login,
+    // we send a request to update users on the network
+    on_updateOnlineUsersButton_clicked();
 }
 
 void Client::on_onlineUsersListWidget_itemClicked(QListWidgetItem *item)
@@ -92,7 +122,8 @@ void Client::on_myChatsListWidget_itemClicked(QListWidgetItem *item) {
 
 // Next two functions are the same
 // Here we describe the JSON for sending messages from user
-void Client::on_sendMessageButton_clicked() {
+void Client::on_sendMessageButton_clicked()
+{
     if (ui->sendMessageLineEdit->text().isEmpty())
         return;
 
@@ -129,7 +160,7 @@ void Client::updateSelectedChat(const QJsonObject& chat)
     for (int coun = 0, our_mess_coun = 0; coun < chat_array.size(); ++coun)
     {
         QString nick;
-        if (coun == mess_num[our_mess_coun].toInt()) {
+        if (!mess_num.empty() && coun == mess_num[our_mess_coun].toInt()) {
             nick = m_username;
             ++our_mess_coun;
         }
@@ -243,21 +274,8 @@ void Client::slotReadyRead()
 
 void Client::determineMessage(const QJsonObject &message)
 {
-    if (message["type"] == "message") {
-        QString from = message["from"].toString();
-        updateMyChats(from);
-
-        if (!m_chats.contains(from)) {
-            receiveMessageUi(from);
-            return;
-        }
-
-        m_chats[from].first->append(
-            message["from"].toString() + ": " + message["message"].toString());
-
-        // For a more readable conclusion. Empty row
-        m_chats[from].first->append("");
-    }
+    if (message["type"] == "message")
+        processMessage(message);
 
     // This is where we supposedly send the key back.
     // However, in this function we encrypt m_message
@@ -274,16 +292,8 @@ void Client::determineMessage(const QJsonObject &message)
         updateOnlineUsersUi(arr);
     }
     else if (message["type"] == "download chats") {
-        QJsonArray user_array = message["array of users"].toArray();
-        for (int i = 0; i < user_array.size(); ++i)
-            ui->myChatsListWidget->addItem(user_array.at(i).toString());
-
-        /// Check Warning in the code block
-        /// no successful registration
-
-        // Upon successful registration/login,
-        // we send a request to update users on the network
-        on_updateOnlineUsersButton_clicked();
+        QJsonArray arr = message["array of users"].toArray();
+        downloadChats(arr);
     }
 
     // Here jsonData["type"] is 'registration' or 'login'
@@ -300,9 +310,11 @@ void Client::determineMessage(const QJsonObject &message)
         /// Do not send two requests at once, with successful registration,
         /// otherwise KABOOM happens!
 
+        // In future. Use two pointers to appropriate class
+        // to do this
         setWindowTitle(m_username);
         m_registration->accept();
     }
     else
-        QMessageBox::warning(this, "Warning", message["feedback"].toString());
+        showWarning(message["feedback"].toString());
 }

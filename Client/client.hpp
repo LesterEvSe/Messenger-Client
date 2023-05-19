@@ -43,8 +43,12 @@ private:
     // and a pointer to the text browser in this index
     QHash<QString, std::pair<QTextBrowser*, int>> m_chats;
 
-    void receiveMessageUi    (const QString& fromUser);
+    void showWarning         (const QString& warning);
     void updateOnlineUsersUi (const QJsonArray& array);
+    void processMessage      (const QJsonObject& message);
+    void receiveMessageUi    (const QString& fromUser);
+    void downloadChats       (const QJsonArray& userArray);
+
     void sendToServer        (const QJsonObject& message) const;
     void updateMyChats       (const QString& username);
     void updateSelectedChat  (const QJsonObject& chat);

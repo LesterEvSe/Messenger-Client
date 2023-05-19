@@ -12,12 +12,14 @@ CONFIG += c++17
 
 SOURCES += \
     client.cpp \
+    clientback.cpp \
     encryption.cpp \
     main.cpp \
     registration.cpp
 
 HEADERS += \
     client.hpp \
+    clientback.hpp \
     encryption.hpp \
     registration.hpp
 
