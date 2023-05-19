@@ -126,10 +126,13 @@ void Client::updateSelectedChat(const QJsonObject& chat)
     for (int coun = 0, our_mess_coun = 0; coun < chat_array.size(); ++coun)
     {
         QString nick;
-        if (coun == mess_num[our_mess_coun].toInt())
-            nick = ui->currChatLabel->text();
-        else
+        if (coun == mess_num[our_mess_coun].toInt()) {
             nick = m_username;
+            ++our_mess_coun;
+        }
+        else
+            nick = ui->currChatLabel->text();
+
         m_chats[ui->currChatLabel->text()].first->append(nick + ": " + chat_array[coun].toString());
         m_chats[ui->currChatLabel->text()].first->append("");
     }
@@ -162,25 +165,25 @@ void Client::sendToServer(const QJsonObject& message) const
     }
     else if (message["type"] == "key") {
         QByteArray cipher_key = message["key"].toString().toUtf8();
-        data = QJsonDocument(m_message).toJson(QJsonDocument::Compact);
+        data = QJsonDocument(*m_message).toJson(QJsonDocument::Compact);
         qDebug() << "before encode in sendToServer \n" << data << '\n';
 
         qDebug() << "cipher key\n" << cipher_key;
         data = m_encryption->encode(data, cipher_key);
 
         qDebug() << "after encode in sendToServer \n" << data;
-        m_message = QJsonObject();
+        m_message = nullptr;
     }
-    else if (m_message.isEmpty()) {
-        qDebug() << 2;
 
-        m_message = message;
+    // Executed when m_message is empty
+    else {
+        m_message = std::make_unique<QJsonObject>(message);
         QJsonObject request;
         request["type"] = "request a key";
         data = QJsonDocument(request).toJson(QJsonDocument::Compact);
     }
-    else
-        data = QJsonDocument(message).toJson(QJsonDocument::Compact);
+    // There is no fourth. Because if the message is NOT empty,
+    // then we have an encryption key
 
     QDataStream out(m_socket);
 

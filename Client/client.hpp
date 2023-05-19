@@ -35,7 +35,7 @@ private:
     Encryption *m_encryption;
 
     // Only this object can be changed in const functions
-    mutable QJsonObject m_message;
+    mutable std::unique_ptr<QJsonObject> m_message;
 
     // Who we are communicating with now will determine the currChatLabel
     // Here is the QString, the username with whom we are communicating
