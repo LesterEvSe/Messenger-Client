@@ -160,18 +160,12 @@ void Client::sendToServer(const QJsonObject& message) const
         answer["type"] = "key";
         answer["key"]  = QString::fromUtf8(m_encryption->get_n());
         data = QJsonDocument(answer).toJson(QJsonDocument::Compact);
-
-        qDebug() << "send key\n" << data << "\n";
     }
     else if (message["type"] == "key") {
         QByteArray cipher_key = message["key"].toString().toUtf8();
         data = QJsonDocument(*m_message).toJson(QJsonDocument::Compact);
-        qDebug() << "before encode in sendToServer \n" << data << '\n';
 
-        qDebug() << "cipher key\n" << cipher_key;
         data = m_encryption->encode(data, cipher_key);
-
-        qDebug() << "after encode in sendToServer \n" << data;
         m_message = nullptr;
     }
 
@@ -183,7 +177,7 @@ void Client::sendToServer(const QJsonObject& message) const
         data = QJsonDocument(request).toJson(QJsonDocument::Compact);
     }
     // There is no fourth. Because if the message is NOT empty,
-    // then we have an encryption key
+    // then we have an encryption key (second block)
 
     QDataStream out(m_socket);
 
@@ -220,7 +214,6 @@ void Client::slotReadyRead()
 
     // when we got the size, then we get our data
     QByteArray data = m_socket->read(m_block_size);
-    qDebug() << "before encode\n" << data << "\n";
 
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson(data, &error);
@@ -229,7 +222,6 @@ void Client::slotReadyRead()
     // Otherwise we get the key
     if (error.error != QJsonParseError::NoError) {
         data = m_encryption->decode(data);
-        qDebug() << "\n" << "Decoded data\n" << data;
         doc = QJsonDocument::fromJson(data, &error);
 
         // If after decryption we get an error
