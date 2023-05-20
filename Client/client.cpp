@@ -1,5 +1,5 @@
 #include "client.hpp"
-#include "ui_clientgui.h"
+#include "ui_client.h"
 
 // To display the window in the center (QApplication::primaryScreen())
 #include <QScreen>
