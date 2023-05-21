@@ -1,6 +1,6 @@
 QT          += core gui network
 LIBS        += -lgmp
-INCLUDEPATH += /usr/include
+INCLUDEPATH += /usr/include src include
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,18 +10,11 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-SOURCES += \
-    client.cpp \
-    clientback.cpp \
-    encryption.cpp \
-    main.cpp \
-    registration.cpp
+SOURCES_DIR = src
+HEADERS_DIR = include
 
-HEADERS += \
-    client.hpp \
-    clientback.hpp \
-    encryption.hpp \
-    registration.hpp
+SOURCES += $$files($$SOURCES_DIR/*.cpp) main.cpp
+HEADERS += $$files($$HEADERS_DIR/*.hpp)
 
 FORMS += \
     client.ui \
