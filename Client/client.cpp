@@ -10,6 +10,10 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 
+#include <QIcon>
+#include <QFile>
+#include <QTextStream>
+#include <QPixmap>
 
 Client::Client(ClientBack *clientBack, QWidget *parent) :
     QWidget(parent),
@@ -18,6 +22,7 @@ Client::Client(ClientBack *clientBack, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->sendMessageLineEdit->setPlaceholderText("Write a message...");
+    setStyles();
 
     QRect screenGeometry = QApplication::primaryScreen()->geometry();
     int w = screenGeometry.width();
@@ -27,16 +32,50 @@ Client::Client(ClientBack *clientBack, QWidget *parent) :
 
 Client::~Client() { delete ui; }
 
-void Client::showWarning(const QString &warning) {
+QString Client::readTextFile(QString path)
+{
+    QFile file(path);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&file);
+        return in.readAll();
+    }
+    return "";
+}
+
+void Client::setStyles()
+{
+    ui->sendMessageButton->setIcon(QIcon(":/res/send-message.png"));
+    ui->sendMessageButton->setIconSize(QSize(48, 32));
+
+    ui->updateOnlineUsersButton->setIcon(QIcon(":/res/refresh-arrow.png"));
+    ui->updateOnlineUsersButton->setIconSize(QSize(48, 32));
+
+    QPixmap pix1(":/res/correspondence.png");
+    QPixmap scaledPixmap = pix1.scaled(QSize(48, 48), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    ui->myChatsLabel->setPixmap(scaledPixmap);
+
+    QPixmap pix2(":/res/online-users.png");
+    scaledPixmap = pix2.scaled(QSize(48, 48), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    ui->onlineUserLabel->setPixmap(scaledPixmap);
+
+    QString css = readTextFile(":/styles/aquamarine.css");
+    if (!css.isEmpty())
+        this->setStyleSheet(css);
+}
+
+
+
+
+void Client::showWarning(const QString& warning) {
     QMessageBox::warning(this, "Warning", warning);
 }
 
-void Client::showErrorAndExit(const QString &error) {
+void Client::showErrorAndExit(const QString& error) {
     QMessageBox::critical(this, "Error", error);
     exit(1);
 }
 
-// Frontend
+
 void Client::on_updateOnlineUsersButton_clicked()
 {
     QJsonObject json;
@@ -117,16 +156,17 @@ void Client::on_myChatsListWidget_itemClicked(QListWidgetItem *item) {
     on_onlineUsersListWidget_itemClicked(item);
 }
 
+
+
 // Next two functions are the same
 // Here we describe the JSON for sending messages from user
 void Client::on_sendMessageButton_clicked()
 {
-    if (ui->sendMessageLineEdit->text().isEmpty())
-        return;
+    QString to      = ui->currChatLabel->text();
+    if (ui->sendMessageLineEdit->text().isEmpty() ||
+            !m_chats.contains(to)) return;
 
     QJsonObject json;
-    QString to      = ui->currChatLabel->text();
-
     json["type"]    = "message";
     json["from"]    = m_client_back->m_username;
     json["to"]      = to;
@@ -147,6 +187,8 @@ void Client::on_sendMessageButton_clicked()
 void Client::on_sendMessageLineEdit_returnPressed() {
     on_sendMessageButton_clicked();
 }
+
+
 
 void Client::updateSelectedChat(const QJsonObject& chat)
 {

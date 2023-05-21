@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>styles/aquamarine.css</file>
+        <file>res/refresh-arrow.png</file>
+        <file>res/send-message.png</file>
+        <file>res/correspondence.png</file>
+        <file>res/online-users.png</file>
+    </qresource>
+</RCC>

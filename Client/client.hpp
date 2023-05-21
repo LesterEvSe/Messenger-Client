@@ -37,9 +37,13 @@ private:
     void updateOnlineUsersUi (const QJsonArray& array);
     void processMessage      (const QJsonObject& message);
     void receiveMessageUi    (const QString& fromUser);
+
     void downloadChats       (const QJsonArray& userArray);
     void updateMyChats       (const QString& username);
     void updateSelectedChat  (const QJsonObject& chat);
+
+    void setStyles();
+    static QString readTextFile(QString path);
 
 private slots:
     void on_updateOnlineUsersButton_clicked();
