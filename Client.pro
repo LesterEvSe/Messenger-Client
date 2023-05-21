@@ -1,6 +1,6 @@
 QT          += core gui network
 LIBS        += -lgmp
-INCLUDEPATH += /usr/include src include
+INCLUDEPATH += /usr/include src include forms
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,13 +12,11 @@ CONFIG += c++17
 
 SOURCES_DIR = src
 HEADERS_DIR = include
+FORMS_DIR   = forms
 
 SOURCES += $$files($$SOURCES_DIR/*.cpp) main.cpp
 HEADERS += $$files($$HEADERS_DIR/*.hpp)
-
-FORMS += \
-    client.ui \
-    registration.ui
+FORMS += $$files($$FORMS_DIR/*.ui)
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
