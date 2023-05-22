@@ -1,6 +1,6 @@
 #include "encryption.hpp"
 
-#include <random>
+#include <random> // std::random_device
 #include <memory> // for smart pointer
 #include <string>
 
@@ -27,6 +27,11 @@ Encryption::Encryption()
     // d = (e^-1) % fi(n)
     // Modular Multiplicative Inverse here
     mpz_invert(d.get_mpz_t(), e.get_mpz_t(), fi_n.get_mpz_t());
+}
+
+Encryption* Encryption::get_instance() {
+    static Encryption rsa = Encryption();
+    return &rsa;
 }
 
 QByteArray Encryption::get_n() const
