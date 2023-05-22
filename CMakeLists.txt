@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_PREFIX_PATH "/home/zhenia/Qt/5.15.2/gcc_64/lib/cmake")
 
-find_package(Qt5 COMPONENTS Core Gui Widgets Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets Network REQUIRED NO_DEFAULT_PATH)
 
 # Add include directories
 include_directories(
@@ -46,9 +46,7 @@ set(FORMS
 
 
 # Add res files
-set(QRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc
-)
+set(QRC ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc)
 
 # Generate executable
 add_executable(Client ${SOURCES} ${HEADERS} ${FORMS} ${QRC})
