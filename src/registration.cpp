@@ -25,7 +25,7 @@ Registration::~Registration() { delete ui; }
 
 void Registration::setStyles()
 {
-    QString css = m_client_back->readTextFile(":/styles/registration.css");
+    QString css = m_client_back->readTextFile("://styles/registration.css");
     if (!css.isEmpty())
         this->setStyleSheet(css);
 }

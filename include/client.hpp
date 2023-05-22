@@ -55,7 +55,7 @@ private slots:
 
 public:
     explicit Client(ClientBack *clientBack, QWidget *parent = nullptr);
-    ~Client();
+    virtual ~Client();
 };
 
 #endif // CLIENT_HPP

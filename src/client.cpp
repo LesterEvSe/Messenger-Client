@@ -32,21 +32,21 @@ Client::~Client() { delete ui; }
 
 void Client::setStyles()
 {
-    ui->sendMessageButton->setIcon(QIcon(":/res/send-message.png"));
+    ui->sendMessageButton->setIcon(QIcon("://res/send-message.png"));
     ui->sendMessageButton->setIconSize(QSize(48, 32));
 
-    ui->updateOnlineUsersButton->setIcon(QIcon(":/res/refresh-arrow.png"));
+    ui->updateOnlineUsersButton->setIcon(QIcon("://res/refresh-arrow.png"));
     ui->updateOnlineUsersButton->setIconSize(QSize(48, 32));
 
-    QPixmap pix1(":/res/correspondence.png");
+    QPixmap pix1("://res/correspondence.png");
     QPixmap scaledPixmap = pix1.scaled(QSize(48, 48), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui->myChatsLabel->setPixmap(scaledPixmap);
 
-    QPixmap pix2(":/res/online-users.png");
+    QPixmap pix2("://res/online-users.png");
     scaledPixmap = pix2.scaled(QSize(48, 48), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui->onlineUserLabel->setPixmap(scaledPixmap);
 
-    QString css = m_client_back->readTextFile(":/styles/client.css");
+    QString css = m_client_back->readTextFile("://styles/client.css");
     if (!css.isEmpty())
         this->setStyleSheet(css);
 }

@@ -40,6 +40,7 @@ public:
 
     int startRegistration();
     explicit ClientBack(QObject *parent = nullptr);
+    virtual ~ClientBack() = default;
 };
 
 #endif // CLIENTBACK_HPP

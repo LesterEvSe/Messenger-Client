@@ -3,7 +3,7 @@ QDialog#Registration {
 }
 
 QLabel {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
 }
 
@@ -23,7 +23,7 @@ QPushButton {
     color: #fff;
     border: none;
     border-radius: 4px;
-    padding: 8px 16px;
+    padding: 8px 18px;
 }
 
 QPushButton:hover {

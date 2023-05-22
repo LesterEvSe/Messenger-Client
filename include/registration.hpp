@@ -35,7 +35,7 @@ private slots:
 
 public:
     explicit Registration(ClientBack *clientBack, QWidget *parent = nullptr);
-    ~Registration();
+    virtual ~Registration();
 };
 
 #endif // REGISTRATION_HPP
