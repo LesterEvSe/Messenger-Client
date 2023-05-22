@@ -1,10 +1,13 @@
-<RCC>
+<!DOCTYPE RCC>
+<RCC version="1.0">
     <qresource prefix="/">
         <file>res/refresh-arrow.png</file>
         <file>res/send-message.png</file>
         <file>res/correspondence.png</file>
         <file>res/online-users.png</file>
-        <file>styles/client.css</file>
-        <file>styles/registration.css</file>
     </qresource>
+	<qresource prefix="/">
+	    <file>styles/client.css</file>
+		<file>styles/registration.css</file>
+	</qresource>
 </RCC>

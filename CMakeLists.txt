@@ -7,9 +7,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# To search everywhere in the Linux root directory
-set(CMAKE_FIND_ROOT_PATH /)
+set(CMAKE_PREFIX_PATH "/home/zhenia/Qt/5.15.2/gcc_64/lib/cmake")
 
 find_package(Qt5 COMPONENTS Core Gui Widgets Network REQUIRED)
 
