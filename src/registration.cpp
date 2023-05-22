@@ -18,9 +18,17 @@ Registration::Registration(ClientBack *clientBack, QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("Registration");
     ui->passwordLineEdit->setEchoMode(QLineEdit::Password);
+    setStyles();
 }
 
 Registration::~Registration() { delete ui; }
+
+void Registration::setStyles()
+{
+    QString css = m_client_back->readTextFile(":/styles/registration.css");
+    if (!css.isEmpty())
+        this->setStyleSheet(css);
+}
 
 void Registration::on_showPasswordCheckBox_toggled(bool checked)
 {

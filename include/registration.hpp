@@ -23,6 +23,7 @@ private:
     static bool isConnected;
 
     void successfulConnection();
+    void setStyles();
 
 private slots:
     void on_showPasswordCheckBox_toggled(bool checked);

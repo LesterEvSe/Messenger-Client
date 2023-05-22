@@ -6,6 +6,9 @@
 #include <QJsonParseError>
 #include <QJsonArray>
 
+#include <QFile>
+#include <QTextStream>
+
 ClientBack::ClientBack(QObject *parent) :
     QTcpSocket(parent),
     m_socket(new QTcpSocket(this)),
@@ -20,6 +23,16 @@ ClientBack::ClientBack(QObject *parent) :
 }
 
 int ClientBack::startRegistration() { return m_registration->exec(); }
+
+QString ClientBack::readTextFile(QString path)
+{
+    QFile file(path);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&file);
+        return in.readAll();
+    }
+    return "";
+}
 
 void ClientBack::sendToServer(const QJsonObject& message) const
 {

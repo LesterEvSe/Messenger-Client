@@ -29,6 +29,7 @@ private:
     // Must be called after slotReadyRead
     void determineMessage    (const QJsonObject& message);
     void sendToServer        (const QJsonObject& message) const;
+    static QString readTextFile(QString path);
 
 public slots:
     void slotReadyRead();

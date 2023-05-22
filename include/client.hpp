@@ -43,7 +43,6 @@ private:
     void updateSelectedChat  (const QJsonObject& chat);
 
     void setStyles();
-    static QString readTextFile(QString path);
 
 private slots:
     void on_updateOnlineUsersButton_clicked();

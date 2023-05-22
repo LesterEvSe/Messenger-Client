@@ -11,8 +11,6 @@
 #include <QJsonParseError>
 
 #include <QIcon>
-#include <QFile>
-#include <QTextStream>
 #include <QPixmap>
 
 Client::Client(ClientBack *clientBack, QWidget *parent) :
@@ -32,16 +30,6 @@ Client::Client(ClientBack *clientBack, QWidget *parent) :
 
 Client::~Client() { delete ui; }
 
-QString Client::readTextFile(QString path)
-{
-    QFile file(path);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-        return in.readAll();
-    }
-    return "";
-}
-
 void Client::setStyles()
 {
     ui->sendMessageButton->setIcon(QIcon(":/res/send-message.png"));
@@ -58,7 +46,7 @@ void Client::setStyles()
     scaledPixmap = pix2.scaled(QSize(48, 48), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui->onlineUserLabel->setPixmap(scaledPixmap);
 
-    QString css = readTextFile(":/styles/aquamarine.css");
+    QString css = m_client_back->readTextFile(":/styles/client.css");
     if (!css.isEmpty())
         this->setStyleSheet(css);
 }
