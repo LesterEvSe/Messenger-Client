@@ -5,15 +5,29 @@ project(Client)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_PREFIX_PATH "/home/zhenia/Qt/5.15.2/gcc_64/lib/cmake")
+
+# Find in Linux file system
+# Use an external command to find the path to the directory (d), starting from /home.
+# Write the result in QT_DIR.
+# Last argument - strip the string of extra characters and spaces
+execute_process(COMMAND find /home -type d -path "*Qt/5.15.2/gcc_64/lib/cmake"
+    OUTPUT_VARIABLE QT_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+if (QT_DIR)
+    list(APPEND CMAKE_PREFIX_PATH "${QT_DIR}")
+    message(STATUS "Set CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+else()
+    message(FATAL_ERROR "Could not find Qt directory")
+endif()
+
 
 find_package(Qt5 COMPONENTS Core Gui Widgets Network REQUIRED)
 
-# Add include directories
 include_directories(
-    /usr/include
+    /usr/include # for lgmp
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/forms
@@ -21,7 +35,6 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/styles
 )
 
-# Add source files
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/client.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/clientback.cpp
@@ -38,14 +51,11 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/registration.hpp
 )
 
-# Add UI files
 set(FORMS
     ${CMAKE_CURRENT_SOURCE_DIR}/forms/client.ui
     ${CMAKE_CURRENT_SOURCE_DIR}/forms/registration.ui
 )
 
-
-# Add res files
 set(QRC ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc)
 
 # Generate executable
@@ -60,6 +70,7 @@ target_link_libraries(Client PRIVATE
     -lgmp
 )
 
+# To specify where the .ui files are located
 set_target_properties(Client PROPERTIES AUTOUIC_SEARCH_PATHS
     ${CMAKE_CURRENT_SOURCE_DIR}/forms
 )
