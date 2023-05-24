@@ -13,7 +13,7 @@ To run the project you need to install the Qt5 and GMP
 2. Go to the download where our *.run* file is installed. Before we run it,
 we need to give permission to run it, using the command ***chmod +x 'name'***
 3. Запускаем наш файл ***./'name'***
-4. During the installation you can not install CMake, Ninja, Qt Creatr components.
+4. During the installation you can not install CMake, Ninja, Qt Creator components.
 However, it is **necessary** to select *Desktop gcc 64* or *gcc 32* for Qt5,
 otherwise the project will not build.
 ###### Note: The gmp library is installed through the .sh files in the next section or through a link in **Build and run** section
