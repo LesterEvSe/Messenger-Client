@@ -18,8 +18,10 @@ However, it is **necessary** to select *Desktop gcc 64* or *gcc 32* for Qt5,
 otherwise the project will not build.
 ###### Note: The gmp library is installed through the .sh files in the next section or through a link in **Build and run** section
 
-## Easy build and run via .sh files for Debian-type distributions (Debian, Ubuntu, Linux Mint etc.)
-Skip this part now
+## Easy build and run via .sh files
+1. Run the console from the **tools** directory.
+2. Install the necessary programs and build the project, using the ***bash build.sh*** command.
+3. You can run the messenger with the ***bash messenger.sh*** command.
 
 ## Build and run
 1. Need to install the GMP library: https://gmplib.org/ or with commands in the console:  
