@@ -1,4 +1,7 @@
-*build*
+build
+*-build-*
+
+# IDEA and Qt files
 *.idea*
 *.user
 
